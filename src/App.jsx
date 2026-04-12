@@ -18,6 +18,564 @@ const MUTE_KEY = "casino-muted";
 const BIG_WIN_THRESHOLD = 100;
 const DAILY_STREAK_BONUSES = [200, 250, 300, 400, 500, 600, 1000]; // day 1-7+
 
+// ── SVG Icon Library ──────────────────────────────────────────────────────────
+// Reusable inline SVG icons — no emoji, no external deps
+const Ic = {
+  // UI actions
+  spin: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M3 10a7 7 0 1 0 1.5-4.3" />
+      <path d="M3 5.5V10h4.5" />
+    </svg>
+  ),
+  flip: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M10 3v14M5 6l5-3 5 3M5 14l5 3 5-3" />
+    </svg>
+  ),
+  roll: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="3" y="3" width="14" height="14" rx="3" />
+      <circle cx="7" cy="7" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="13" cy="7" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="10" cy="10" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="7" cy="13" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="13" cy="13" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  deal: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="3" y="3" width="9" height="13" rx="1.5" />
+      <rect x="8" y="4" width="9" height="13" rx="1.5" />
+    </svg>
+  ),
+  hit: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M10 4v12M4 10h12" />
+    </svg>
+  ),
+  stand: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M4 10h12" />
+      <path d="M4 14h12" />
+    </svg>
+  ),
+  double: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="2" y="4" width="8" height="12" rx="1.5" />
+      <rect x="10" y="4" width="8" height="12" rx="1.5" />
+    </svg>
+  ),
+  higher: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 15V5M5 10l5-5 5 5" />
+    </svg>
+  ),
+  lower: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 5v10M5 10l5 5 5-5" />
+    </svg>
+  ),
+  cashout: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="10" r="7" />
+      <path d="M10 7v1.2M10 11.8V13" />
+      <path d="M8.2 9c0-.9.8-1.6 1.8-1.6s1.8.7 1.8 1.6c0 .7-.5 1.2-1.8 1.4-1.3.2-1.8.7-1.8 1.4 0 .9.8 1.6 1.8 1.6s1.8-.7 1.8-1.6" />
+    </svg>
+  ),
+  start: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <polygon points="5,3 17,10 5,17" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  replay: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M4 10a6 6 0 1 0 1.2-3.6" />
+      <path d="M4 5.5V10h4.5" />
+    </svg>
+  ),
+  drop: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="5" r="2.5" fill="currentColor" stroke="none" />
+      <path
+        d="M10 7.5 Q6 11 6 14a4 4 0 0 0 8 0Q14 11 10 7.5z"
+        fill="currentColor"
+        fillOpacity="0.3"
+        stroke="currentColor"
+      />
+    </svg>
+  ),
+  war: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M4 16 L14 6" />
+      <path d="M14 6 L16 4 L14 6z" fill="currentColor" />
+      <rect
+        x="8"
+        y="9.5"
+        width="4"
+        height="1.5"
+        rx="0.7"
+        transform="rotate(-45 8 9.5)"
+        fill="currentColor"
+        stroke="none"
+      />
+      <path d="M4 16 L3 17" strokeWidth="2" />
+    </svg>
+  ),
+  surrender: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M7 3 L7 12" />
+      <path d="M7 3 L14 6 L7 9" />
+      <path d="M5 16 L15 16" />
+    </svg>
+  ),
+  clear: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M5 5 L15 15M15 5 L5 15" />
+    </svg>
+  ),
+  undo: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M4 8a6 6 0 1 1 0 4" />
+      <path d="M4 4v4h4" />
+    </svg>
+  ),
+  reload: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M3 10a7 7 0 1 0 1.5-4.3" />
+      <path d="M3 5.5V10h4.5" />
+    </svg>
+  ),
+  copy: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="7" y="7" width="10" height="10" rx="1.5" />
+      <path d="M13 7V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" />
+    </svg>
+  ),
+  // UI state
+  mute: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M3 7.5h2.5L9 4v12l-3.5-3.5H3z" />
+      <path d="M13 7a4 4 0 0 1 0 6" />
+      <path d="M15.5 4.5a8 8 0 0 1 0 11" />
+    </svg>
+  ),
+  muted: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M3 7.5h2.5L9 4v12l-3.5-3.5H3z" />
+      <path d="M13 8 L17 12M17 8 L13 12" />
+    </svg>
+  ),
+  stats: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="3" y="11" width="3" height="6" rx="0.8" />
+      <rect x="8.5" y="7" width="3" height="10" rx="0.8" />
+      <rect x="14" y="3" width="3" height="14" rx="0.8" />
+    </svg>
+  ),
+  trophy: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M6 3h8v6a4 4 0 0 1-8 0z" />
+      <path d="M10 13v3M7 16h6" />
+      <path d="M3 5h3M14 5h3" />
+      <path d="M3 5a2 2 0 0 0 2 2M17 5a2 2 0 0 1-2 2" />
+    </svg>
+  ),
+  medal: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="13" r="5" />
+      <path d="M7 3 L10 8 L13 3" />
+      <path d="M10 10.5 L10 11.5M9 12.5 L11 12.5" />
+    </svg>
+  ),
+  close: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    >
+      <path d="M5 5 L15 15M15 5 L5 15" />
+    </svg>
+  ),
+  gift: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="2" y="8" width="16" height="10" rx="1.5" />
+      <path d="M2 8h16v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z" />
+      <path d="M10 5V18" />
+      <path d="M10 5 C10 5 8 2 6 3s-1 3 4 2" />
+      <path d="M10 5 C10 5 12 2 14 3s1 3-4 2" />
+    </svg>
+  ),
+  warn: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M10 2 L18 17 H2 Z" />
+      <path d="M10 8 L10 12" />
+      <circle cx="10" cy="14.5" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  coin: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="10" r="7.5" />
+      <circle cx="10" cy="10" r="5" strokeWidth="0.8" opacity="0.4" />
+      <path d="M10 7v.8M10 12.2V13" />
+      <path d="M8.5 8.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5c0 .6-.4 1-1.5 1.2-1.1.2-1.5.6-1.5 1.2 0 .8.7 1.5 1.5 1.5s1.5-.7 1.5-1.5" />
+    </svg>
+  ),
+  best: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M10 2l2.4 4.8 5.3.8-3.8 3.7.9 5.2L10 14l-4.8 2.5.9-5.2L2.3 7.6l5.3-.8z" />
+    </svg>
+  ),
+  // result states
+  win: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 10 L8 14 L16 6" />
+    </svg>
+  ),
+  lose: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    >
+      <path d="M5 5 L15 15M15 5 L5 15" />
+    </svg>
+  ),
+  push: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    >
+      <path d="M4 10 h12" />
+    </svg>
+  ),
+  crash: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    >
+      <path d="M10 3 L10 11M7 8 L10 11 L13 8" />
+      <path d="M5 16 L15 16" />
+    </svg>
+  ),
+  // roulette color dots
+  redDot: (
+    <svg viewBox="0 0 12 12">
+      <circle cx="6" cy="6" r="5" fill="#dc2626" />
+    </svg>
+  ),
+  blackDot: (
+    <svg viewBox="0 0 12 12">
+      <circle cx="6" cy="6" r="5" fill="#404040" />
+    </svg>
+  ),
+  greenDot: (
+    <svg viewBox="0 0 12 12">
+      <circle cx="6" cy="6" r="5" fill="#16a34a" />
+    </svg>
+  ),
+  // card back
+  cardBack: (
+    <svg
+      viewBox="0 0 40 56"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <rect x="1" y="1" width="38" height="54" rx="4" fill="#1a1200" />
+      <rect
+        x="4"
+        y="4"
+        width="32"
+        height="48"
+        rx="3"
+        stroke="currentColor"
+        strokeWidth="0.8"
+        strokeDasharray="3 2"
+        opacity="0.3"
+      />
+      <path
+        d="M20 14 L26 20 L20 26 L14 20 Z"
+        stroke="currentColor"
+        strokeWidth="1"
+        opacity="0.4"
+      />
+    </svg>
+  ),
+  // streak / fire
+  fire: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+    >
+      <path
+        d="M10 17 C6 17 4 14 4 11 C4 8 6 6 8 5 C8 7 9 8 10 8 C10 5 12 3 13 2 C14 5 16 7 16 11 C16 14 14 17 10 17Z"
+        fill="currentColor"
+        fillOpacity="0.2"
+      />
+    </svg>
+  ),
+  // leaderboard positions
+  gold: (
+    <svg viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="8" fill="#f59e0b" opacity="0.9" />
+      <text
+        x="10"
+        y="14"
+        textAnchor="middle"
+        fontSize="10"
+        fontWeight="bold"
+        fill="#000"
+      >
+        1
+      </text>
+    </svg>
+  ),
+  silver: (
+    <svg viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="8" fill="#9ca3af" opacity="0.9" />
+      <text
+        x="10"
+        y="14"
+        textAnchor="middle"
+        fontSize="10"
+        fontWeight="bold"
+        fill="#000"
+      >
+        2
+      </text>
+    </svg>
+  ),
+  bronze: (
+    <svg viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="8" fill="#b45309" opacity="0.9" />
+      <text
+        x="10"
+        y="14"
+        textAnchor="middle"
+        fontSize="10"
+        fontWeight="bold"
+        fill="#000"
+      >
+        3
+      </text>
+    </svg>
+  ),
+};
+
+// Helper: icon button with SVG
+function IconBtn({
+  icon,
+  label,
+  onClick,
+  className = "",
+  disabled = false,
+  title = "",
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`flex items-center justify-center gap-1.5 ${className}`}
+    >
+      <span className="w-4 h-4 flex-shrink-0">{icon}</span>
+      {label && <span>{label}</span>}
+    </button>
+  );
+}
+
 // ── persistence ────────────────────────────────────────────────────────────────
 function loadState() {
   try {
@@ -233,7 +791,9 @@ function BigWinOverlay({ amount, onDone }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
       <div className="relative flex flex-col items-center gap-3 animate-bigwin">
-        <div className="text-6xl animate-bounce">🎉</div>
+        <div className="w-16 h-16 mx-auto animate-bounce text-yellow-400">
+          {Ic.win}
+        </div>
         <div className="rounded-2xl border-2 border-yellow-400 bg-black/80 px-8 py-5 text-center shadow-[0_0_60px_#f59e0b88] backdrop-blur-sm">
           <p className="text-xs tracking-[0.4em] text-yellow-600 uppercase">
             Big Win!
@@ -247,10 +807,10 @@ function BigWinOverlay({ amount, onDone }) {
           <p className="mt-1 text-sm text-yellow-600">coins</p>
         </div>
         <div
-          className="text-5xl animate-bounce"
+          className="w-12 h-12 mx-auto animate-bounce text-yellow-500"
           style={{ animationDelay: "0.1s" }}
         >
-          🎊
+          {Ic.trophy}
         </div>
       </div>
     </div>
@@ -293,7 +853,9 @@ function SessionSummary({ session, onClose }) {
         className="card-glass m-4 w-full max-w-xs rounded-2xl p-6 text-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-3 text-4xl">{net >= 0 ? "🏆" : "💸"}</div>
+        <div className="mb-3 w-12 h-12 mx-auto text-yellow-400">
+          {net >= 0 ? Ic.trophy : Ic.lose}
+        </div>
         <h2 className="text-lg font-bold text-yellow-400 tracking-widest">
           SESSION OVER
         </h2>
@@ -350,41 +912,44 @@ function StatsModal({ stats, achievements, leaderboard, onClose }) {
                 onClick={() => setTab(t)}
                 className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition ${tab === t ? "btn-gold" : "btn-outline"}`}
               >
-                {t === "stats" ? "📊" : t === "achievements" ? "🏅" : "🏆"}
+                {t === "stats" ? (
+                  <span className="w-4 h-4">{Ic.stats}</span>
+                ) : t === "achievements" ? (
+                  <span className="w-4 h-4">{Ic.medal}</span>
+                ) : (
+                  <span className="w-4 h-4">{Ic.trophy}</span>
+                )}
               </button>
             ))}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-yellow-700 hover:text-yellow-400 text-xl"
+            className="text-yellow-700 hover:text-yellow-400 w-6 h-6 flex items-center justify-center"
           >
-            ✕
+            <span className="w-4 h-4">{Ic.close}</span>
           </button>
         </div>
 
         {tab === "stats" && (
           <div className="grid grid-cols-2 gap-2">
             {[
-              ["🎮 Games", stats.played],
-              ["🏆 Wins", stats.wins],
-              ["💸 Losses", stats.losses],
+              ["Games", stats.played],
+              ["Wins", stats.wins],
+              ["Losses", stats.losses],
               [
-                "📊 Win Rate",
+                "Win Rate",
                 stats.played
                   ? Math.round((stats.wins / stats.played) * 100) + "%"
                   : "—",
               ],
               [
-                "💰 Biggest Win",
+                "Biggest Win",
                 stats.biggestWin > 0 ? "+" + stats.biggestWin : "—",
               ],
-              [
-                "📉 Biggest Loss",
-                stats.biggestLoss < 0 ? stats.biggestLoss : "—",
-              ],
-              ["🪙 Total Won", stats.totalWon > 0 ? "+" + stats.totalWon : "0"],
-              ["🔥 Best Streak", stats.bestStreak],
+              ["Biggest Loss", stats.biggestLoss < 0 ? stats.biggestLoss : "—"],
+              ["Total Won", stats.totalWon > 0 ? "+" + stats.totalWon : "0"],
+              ["Best Streak", stats.bestStreak],
             ].map(([l, v]) => (
               <div
                 key={l}
@@ -444,13 +1009,15 @@ function StatsModal({ stats, achievements, leaderboard, onClose }) {
                 className="flex items-center gap-3 rounded-xl border border-[#2a1e00] bg-[#0f0c00] px-3 py-2"
               >
                 <span className="text-lg">
-                  {i === 0
-                    ? "🥇"
-                    : i === 1
-                      ? "🥈"
-                      : i === 2
-                        ? "🥉"
-                        : `${i + 1}.`}
+                  {i === 0 ? (
+                    <span className="w-5 h-5">{Ic.gold}</span>
+                  ) : i === 1 ? (
+                    <span className="w-5 h-5">{Ic.silver}</span>
+                  ) : i === 2 ? (
+                    <span className="w-5 h-5">{Ic.bronze}</span>
+                  ) : (
+                    <span className="text-yellow-800 text-xs">{i + 1}</span>
+                  )}
                 </span>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-yellow-400">
@@ -482,7 +1049,7 @@ function DailyBonusModal({ streak, bonus, onClaim }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="card-glass m-4 w-full max-w-xs rounded-2xl p-6 text-center">
-        <div className="mb-3 text-5xl">🎁</div>
+        <div className="mb-3 w-14 h-14 mx-auto text-yellow-400">{Ic.gift}</div>
         <h2 className="text-xl font-bold text-yellow-400 tracking-widest">
           DAILY BONUS
         </h2>
@@ -530,7 +1097,7 @@ function BetConfirm({ amount, onConfirm, onCancel }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
       <div className="card-glass m-4 w-full max-w-xs rounded-2xl p-5 text-center">
-        <div className="mb-3 text-4xl">⚠️</div>
+        <div className="mb-3 w-12 h-12 mx-auto text-yellow-500">{Ic.warn}</div>
         <h2 className="text-base font-bold text-yellow-400">Large Bet</h2>
         <p className="mt-2 text-sm text-yellow-700">
           You're about to bet{" "}
@@ -801,7 +1368,10 @@ function SlotMachine({ coins, onResult }) {
           disabled={spinning || autoSpin || coins < bet}
           className="btn-gold flex-1 py-3 text-base tracking-[0.2em]"
         >
-          {spinning ? "⟳  SPINNING..." : "🎰  SPIN"}
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.spin}</span>
+            {spinning ? "SPINNING..." : "SPIN"}
+          </span>
         </button>
         <button
           type="button"
@@ -809,7 +1379,14 @@ function SlotMachine({ coins, onResult }) {
           disabled={coins < bet}
           className={`rounded-xl px-4 py-3 text-sm font-bold transition ${autoSpin ? "bg-red-800 border border-red-600 text-red-200" : "btn-outline"}`}
         >
-          {autoSpin ? `⏹ ${autoCount}` : "AUTO"}
+          {autoSpin ? (
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3">{Ic.stand}</span>
+              {autoCount}
+            </span>
+          ) : (
+            "AUTO"
+          )}
         </button>
       </div>
       <details className="w-full">
@@ -838,21 +1415,57 @@ function CoinFlip({ coins, onResult }) {
   const [flipping, setFlipping] = useState(false);
   const [outcome, setOutcome] = useState(null);
   const [bet, setBet] = useState(10);
+  // track rotation for smooth continuous flip
+  const rotationRef = useRef(0);
+  const animRef = useRef(null);
+  const [rotation, setRotation] = useState(0);
 
   const flip = () => {
     if (!choice || flipping || coins < bet) return;
     SFX.flip();
     setOutcome(null);
     setFlipping(true);
-    setTimeout(() => {
-      const result = Math.random() < 0.5 ? "heads" : "tails";
-      const win = result === choice;
-      setOutcome({ result, win });
-      onResult(win ? bet : -bet);
-      win ? SFX.win() : SFX.lose();
-      setFlipping(false);
-    }, 1200);
+
+    const startRot = rotationRef.current;
+    const startTime = performance.now();
+    const duration = 1200;
+    // spin at least 4 full rotations
+    const totalSpin = 360 * 4 + Math.random() * 360;
+
+    const animate = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const rot = startRot + totalSpin * eased;
+      rotationRef.current = rot;
+      setRotation(rot);
+      if (progress < 1) {
+        animRef.current = requestAnimationFrame(animate);
+      } else {
+        const result = Math.random() < 0.5 ? "heads" : "tails";
+        // snap to correct face: heads = even 360 (front), tails = odd 180 (back)
+        const snapRot =
+          result === "heads"
+            ? Math.ceil(rot / 360) * 360
+            : Math.ceil(rot / 360) * 360 - 180;
+        rotationRef.current = snapRot;
+        setRotation(snapRot);
+        const win = result === choice;
+        setOutcome({ result, win });
+        onResult(win ? bet : -bet);
+        win ? SFX.win() : SFX.lose();
+        setFlipping(false);
+      }
+    };
+    animRef.current = requestAnimationFrame(animate);
   };
+
+  useEffect(() => () => cancelAnimationFrame(animRef.current), []);
+
+  // which face is showing based on rotation
+  const normalizedRot = ((rotation % 360) + 360) % 360;
+  const showingFront = normalizedRot < 90 || normalizedRot >= 270;
 
   return (
     <div className="fadeup flex flex-col items-center gap-5">
@@ -862,26 +1475,76 @@ function CoinFlip({ coins, onResult }) {
         </p>
         <p className="mt-0.5 text-[10px] text-yellow-900">Double or nothing</p>
       </div>
-      <div className="relative flex items-center justify-center">
+
+      {/* 3D coin */}
+      <div
+        className="relative flex items-center justify-center"
+        style={{ perspective: "600px" }}
+      >
+        {/* glow */}
         <div
-          className={`absolute h-36 w-36 rounded-full transition-all duration-500 ${flipping ? "bg-yellow-500/10 blur-xl scale-110" : outcome?.win ? "bg-yellow-500/10 blur-lg" : "bg-transparent"}`}
+          className={`absolute h-40 w-40 rounded-full transition-all duration-500 blur-2xl
+          ${flipping ? "bg-yellow-500/15 scale-110" : outcome?.win ? "bg-yellow-500/12" : "bg-transparent"}`}
         />
+
+        {/* coin wrapper — rotates on Y axis */}
         <div
-          className={`relative flex h-28 w-28 items-center justify-center rounded-full border-4 text-5xl select-none shadow-[0_8px_32px_#00000088]
-          ${flipping ? "coin-spinning border-yellow-400 shadow-[0_0_32px_#f59e0b66]" : outcome?.win ? "glow-win border-yellow-400" : outcome ? "border-red-700" : "border-[#3d2e00]"}
-          bg-gradient-to-br from-yellow-800 via-yellow-900 to-yellow-950`}
+          className="relative select-none"
+          style={{
+            width: 112,
+            height: 112,
+            transformStyle: "preserve-3d",
+            transform: `rotateY(${rotation}deg)`,
+            transition: flipping ? "none" : "transform 0.4s ease-out",
+          }}
         >
-          <span className="drop-shadow-lg">
-            {flipping
-              ? "🪙"
-              : outcome
-                ? outcome.result === "heads"
-                  ? "👑"
-                  : "🦅"
-                : "🪙"}
-          </span>
+          {/* FRONT — Heads */}
+          <div
+            className="coin-face coin-front"
+            style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+            }}
+          >
+            <div
+              className={`coin-ring ${outcome?.win && outcome.result === "heads" ? "ring-win" : outcome && outcome.result !== "heads" ? "ring-lose" : ""}`}
+            >
+              {/* outer ring detail */}
+              <div className="coin-inner">
+                <div className="coin-symbol">👑</div>
+                <div className="coin-label">HEADS</div>
+              </div>
+            </div>
+          </div>
+
+          {/* BACK — Tails (rotated 180deg on Y) */}
+          <div
+            className="coin-face coin-back"
+            style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+            }}
+          >
+            <div
+              className={`coin-ring ${outcome?.win && outcome.result === "tails" ? "ring-win" : outcome && outcome.result !== "tails" ? "ring-lose" : ""}`}
+            >
+              <div className="coin-inner">
+                <div className="coin-symbol">🦅</div>
+                <div className="coin-label">TAILS</div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* edge indicator */}
+        {!flipping && !outcome && (
+          <div className="absolute -bottom-6 text-[10px] text-yellow-800 tracking-widest">
+            {showingFront ? "HEADS" : "TAILS"}
+          </div>
+        )}
       </div>
+
       {outcome && (
         <div
           className={`fadeup w-full rounded-xl px-5 py-3 text-center text-sm font-bold ${outcome.win ? "result-win glow-win" : "result-lose shake"}`}
@@ -894,6 +1557,7 @@ function CoinFlip({ coins, onResult }) {
           </span>
         </div>
       )}
+
       <div className="flex w-full gap-3">
         {["heads", "tails"].map((c) => (
           <button
@@ -917,43 +1581,218 @@ function CoinFlip({ coins, onResult }) {
         disabled={!choice || flipping || coins < bet}
         className="btn-gold w-full py-3 text-base tracking-[0.2em]"
       >
-        {flipping ? "⟳  FLIPPING..." : "🪙  FLIP"}
+        <span className="flex items-center justify-center gap-2">
+          <span className="w-4 h-4">{Ic.flip}</span>
+          {flipping ? "FLIPPING..." : "FLIP"}
+        </span>
       </button>
     </div>
   );
 }
 
-// ── Lucky Number ───────────────────────────────────────────────────────────────
+// ── High Low ───────────────────────────────────────────────────────────────────
+// ── Lucky Number (3D CSS cube dice) ───────────────────────────────────────────
+// dot positions per face [col, row] on a 3×3 grid (0-2)
+const FACE_DOTS = {
+  1: [[1, 1]],
+  2: [
+    [0, 0],
+    [2, 2],
+  ],
+  3: [
+    [0, 0],
+    [1, 1],
+    [2, 2],
+  ],
+  4: [
+    [0, 0],
+    [2, 0],
+    [0, 2],
+    [2, 2],
+  ],
+  5: [
+    [0, 0],
+    [2, 0],
+    [1, 1],
+    [0, 2],
+    [2, 2],
+  ],
+  6: [
+    [0, 0],
+    [2, 0],
+    [0, 1],
+    [2, 1],
+    [0, 2],
+    [2, 2],
+  ],
+};
+
+// CSS cube face — pure div with dots
+function CubeFace({ face, label, style, isResult, isWin }) {
+  const dots = FACE_DOTS[face] ?? FACE_DOTS[1];
+  return (
+    <div className="dice-face" style={style}>
+      <div
+        className={`dice-face-inner ${isResult ? (isWin ? "dice-win" : "dice-lose") : ""}`}
+      >
+        <div className="dice-dots-grid">
+          {Array.from({ length: 9 }, (_, i) => {
+            const col = i % 3,
+              row = Math.floor(i / 3);
+            const hasDot = dots.some(([c, r]) => c === col && r === row);
+            return (
+              <div key={i} className={`dice-dot-cell`}>
+                {hasDot && <div className="dice-dot" />}
+              </div>
+            );
+          })}
+        </div>
+        {label && <div className="dice-label">{label}</div>}
+      </div>
+    </div>
+  );
+}
+
+function Dice3D({ rotX, rotY, result, isWin, rolling }) {
+  const S = 90; // cube size px
+  const h = S / 2;
+  return (
+    <div
+      style={{
+        width: S,
+        height: S,
+        perspective: 600,
+        perspectiveOrigin: "50% 50%",
+      }}
+    >
+      <div
+        className="dice-cube"
+        style={{
+          width: S,
+          height: S,
+          transformStyle: "preserve-3d",
+          transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+          transition: rolling
+            ? "none"
+            : "transform 0.6s cubic-bezier(.22,.68,0,1.2)",
+        }}
+      >
+        {/* front  */}
+        <CubeFace
+          face={1}
+          style={{ transform: `translateZ(${h}px)` }}
+          isResult={result === 1}
+          isWin={isWin}
+        />
+        {/* back   */}
+        <CubeFace
+          face={6}
+          style={{ transform: `rotateY(180deg) translateZ(${h}px)` }}
+          isResult={result === 6}
+          isWin={isWin}
+        />
+        {/* right  */}
+        <CubeFace
+          face={2}
+          style={{ transform: `rotateY(90deg) translateZ(${h}px)` }}
+          isResult={result === 2}
+          isWin={isWin}
+        />
+        {/* left   */}
+        <CubeFace
+          face={5}
+          style={{ transform: `rotateY(-90deg) translateZ(${h}px)` }}
+          isResult={result === 5}
+          isWin={isWin}
+        />
+        {/* top    */}
+        <CubeFace
+          face={3}
+          style={{ transform: `rotateX(90deg) translateZ(${h}px)` }}
+          isResult={result === 3}
+          isWin={isWin}
+        />
+        {/* bottom */}
+        <CubeFace
+          face={4}
+          style={{ transform: `rotateX(-90deg) translateZ(${h}px)` }}
+          isResult={result === 4}
+          isWin={isWin}
+        />
+      </div>
+    </div>
+  );
+}
+
 function LuckyNumber({ coins, onResult }) {
   const [pick, setPick] = useState(null);
   const [rolling, setRolling] = useState(false);
   const [outcome, setOutcome] = useState(null);
   const [bet, setBet] = useState(10);
   const [displayNum, setDisplayNum] = useState(null);
+  const [rotX, setRotX] = useState(-20);
+  const [rotY, setRotY] = useState(30);
+  const animRef = useRef(null);
   const intervalRef = useRef(null);
+  const frameRef = useRef(0);
 
   const roll = () => {
     if (pick === null || rolling || coins < bet) return;
     SFX.spin();
     setOutcome(null);
     setRolling(true);
+
+    // fast tumbling spin
+    frameRef.current = 0;
+    const tumble = () => {
+      frameRef.current++;
+      setRotX((rx) => rx + 23);
+      setRotY((ry) => ry + 17);
+      if (frameRef.current < 40)
+        animRef.current = requestAnimationFrame(tumble);
+    };
+    animRef.current = requestAnimationFrame(tumble);
+
     let ticks = 0;
     intervalRef.current = setInterval(() => {
-      setDisplayNum(Math.floor(Math.random() * 10) + 1);
+      setDisplayNum(Math.floor(Math.random() * 6) + 1);
       ticks++;
       if (ticks > 18) {
         clearInterval(intervalRef.current);
-        const result = Math.floor(Math.random() * 10) + 1;
+        cancelAnimationFrame(animRef.current);
+        const result = Math.floor(Math.random() * 6) + 1;
         setDisplayNum(result);
+        // snap to the correct face (result is already 1-6)
+        const snaps = {
+          1: [0, 0],
+          2: [0, -90],
+          3: [-90, 0],
+          4: [90, 0],
+          5: [0, 90],
+          6: [0, 180],
+        };
+        const [sx, sy] = snaps[result];
+        // add full rotations to avoid snapping backwards
+        setRotX((rx) => Math.round(rx / 360) * 360 + sx);
+        setRotY((ry) => Math.round(ry / 360) * 360 + sy);
         const win = result === pick;
         setOutcome({ result, win });
-        onResult(win ? bet * 8 : -bet);
+        onResult(win ? bet * 5 : -bet);
         win ? SFX.bigwin() : SFX.lose();
         setRolling(false);
       }
     }, 80);
   };
-  useEffect(() => () => clearInterval(intervalRef.current), []);
+
+  useEffect(
+    () => () => {
+      clearInterval(intervalRef.current);
+      cancelAnimationFrame(animRef.current);
+    },
+    [],
+  );
+
+  const diceFace = displayNum ?? null;
 
   return (
     <div className="fadeup flex flex-col items-center gap-5">
@@ -962,41 +1801,42 @@ function LuckyNumber({ coins, onResult }) {
           Lucky Number
         </p>
         <p className="mt-0.5 text-[10px] text-yellow-900">
-          Pick 1–10 · Win = ×8 your bet
+          Pick 1–6 · Win = ×5 your bet
         </p>
       </div>
-      <div className="relative flex items-center justify-center">
+
+      {/* dice area */}
+      <div
+        className="relative flex flex-col items-center gap-2"
+        style={{ minHeight: 130 }}
+      >
+        {/* ambient glow */}
         <div
-          className={`absolute h-32 w-32 rounded-full blur-2xl transition-all duration-500 ${rolling ? "bg-yellow-500/15 scale-110" : outcome?.win ? "bg-yellow-500/10" : "bg-transparent"}`}
+          className={`absolute top-0 h-32 w-32 rounded-full blur-2xl transition-all duration-500 pointer-events-none
+          ${rolling ? "bg-yellow-500/20 scale-110" : outcome?.win ? "bg-yellow-500/15" : "bg-transparent"}`}
         />
-        <div
-          className={`relative flex h-28 w-28 items-center justify-center rounded-2xl border-2 text-6xl font-bold select-none shadow-[0_8px_32px_#00000088,inset_0_1px_0_#ffffff08]
-          ${rolling ? "border-yellow-500 animate-pulse bg-gradient-to-b from-[#1a1200] to-[#0f0c00]" : outcome?.win ? "glow-win border-yellow-400 bg-gradient-to-b from-[#2a1e00] to-[#1a1200]" : outcome ? "border-red-800 bg-gradient-to-b from-[#1a0000] to-[#0f0000]" : "border-[#2a1e00] bg-gradient-to-b from-[#1a1200] to-[#0f0c00]"}`}
-        >
-          <span
-            className={
-              rolling
-                ? "text-yellow-400"
-                : outcome?.win
-                  ? "text-yellow-300"
-                  : "text-yellow-600"
-            }
-          >
-            {displayNum ?? "?"}
-          </span>
-        </div>
+
+        <Dice3D
+          rotX={rotX}
+          rotY={rotY}
+          result={diceFace}
+          isWin={outcome?.win}
+          rolling={rolling}
+        />
       </div>
+
       {outcome && (
         <div
           className={`fadeup w-full rounded-xl px-5 py-3 text-center text-sm font-bold ${outcome.win ? "result-win glow-win" : "result-lose shake"}`}
         >
           {outcome.win
-            ? `🎉 JACKPOT!  +${bet * 8} coins`
+            ? `🎉 JACKPOT!  +${bet * 5} coins`
             : `💸 It was ${outcome.result} — lost ${bet} coins`}
         </div>
       )}
-      <div className="grid grid-cols-5 gap-2">
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+
+      <div className="grid grid-cols-6 gap-2">
+        {Array.from({ length: 6 }, (_, i) => i + 1).map((n) => (
           <button
             key={n}
             type="button"
@@ -1011,6 +1851,7 @@ function LuckyNumber({ coins, onResult }) {
           </button>
         ))}
       </div>
+
       <BetSelector
         bet={bet}
         setBet={setBet}
@@ -1023,7 +1864,10 @@ function LuckyNumber({ coins, onResult }) {
         disabled={pick === null || rolling || coins < bet}
         className="btn-gold w-full py-3 text-base tracking-[0.2em]"
       >
-        {rolling ? "⟳  ROLLING..." : "🎲  ROLL"}
+        <span className="flex items-center justify-center gap-2">
+          <span className="w-4 h-4">{Ic.roll}</span>
+          {rolling ? "ROLLING..." : "ROLL"}
+        </span>
       </button>
     </div>
   );
@@ -1101,7 +1945,10 @@ function HighLow({ coins, onResult }) {
       </div>
       {streak > 0 && (
         <div className="streak-badge">
-          🔥 Streak {streak} · Next ×{(1 + streak * 0.5).toFixed(1)}
+          <span className="flex items-center justify-center gap-1.5">
+            <span className="w-3.5 h-3.5">{Ic.fire}</span>Streak {streak} · Next
+            ×{(1 + streak * 0.5).toFixed(1)}
+          </span>
         </div>
       )}
       <div className="flex items-center gap-5">
@@ -1144,7 +1991,9 @@ function HighLow({ coins, onResult }) {
           disabled={guessing || coins < bet}
           className="btn-gold flex-1 py-3 text-base tracking-wider"
         >
-          ⬆ HIGHER
+          <span className="flex items-center justify-center gap-1.5">
+            <span className="w-4 h-4">{Ic.higher}</span>HIGHER
+          </span>
         </button>
         <button
           type="button"
@@ -1152,7 +2001,9 @@ function HighLow({ coins, onResult }) {
           disabled={guessing || coins < bet}
           className="btn-outline flex-1 py-3 text-base tracking-wider"
         >
-          ⬇ LOWER
+          <span className="flex items-center justify-center gap-1.5">
+            <span className="w-4 h-4">{Ic.lower}</span>LOWER
+          </span>
         </button>
       </div>
       <BetSelector bet={bet} setBet={setBet} disabled={guessing} />
@@ -1253,14 +2104,16 @@ function CrashGame({ coins, onResult }) {
             {multiplier.toFixed(2)}×
           </p>
           {phase === "crashed" && (
-            <p className="mt-1 text-sm font-bold text-red-400 tracking-widest">
-              💥 CRASHED
+            <p className="mt-1 flex items-center justify-center gap-1.5 text-sm font-bold text-red-400 tracking-widest">
+              <span className="w-4 h-4">{Ic.crash}</span>CRASHED
             </p>
           )}
           {phase === "cashed" && (
             <p className="mt-1 text-sm font-bold text-yellow-300">
-              ✅ Cashed at {cashedAt}× · +{Math.floor(bet * cashedAt) - bet}{" "}
-              coins
+              <span className="inline-flex items-center gap-1">
+                <span className="w-3.5 h-3.5">{Ic.win}</span>Cashed at{" "}
+                {cashedAt}× · +{Math.floor(bet * cashedAt) - bet} coins
+              </span>
             </p>
           )}
           {phase === "running" && (
@@ -1281,7 +2134,10 @@ function CrashGame({ coins, onResult }) {
             boxShadow: `0 0 24px ${color}66`,
           }}
         >
-          💰 CASH OUT {multiplier.toFixed(2)}×
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.cashout}</span>CASH OUT{" "}
+            {multiplier.toFixed(2)}×
+          </span>
         </button>
       ) : (
         <button
@@ -1290,7 +2146,12 @@ function CrashGame({ coins, onResult }) {
           disabled={coins < bet}
           className="btn-gold w-full py-3 text-base tracking-[0.2em]"
         >
-          {phase === "idle" ? "🚀  START" : "🔄  PLAY AGAIN"}
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">
+              {phase === "idle" ? Ic.start : Ic.replay}
+            </span>
+            {phase === "idle" ? "START" : "PLAY AGAIN"}
+          </span>
         </button>
       )}
       {phase === "idle" && (
@@ -1569,7 +2430,9 @@ function Blackjack({ coins, onResult }) {
           disabled={coins < bet}
           className="btn-gold w-full py-3 text-base tracking-[0.2em]"
         >
-          🃏 DEAL
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.deal}</span>DEAL
+          </span>
         </button>
       )}
       {phase === "playing" && (
@@ -1579,14 +2442,18 @@ function Blackjack({ coins, onResult }) {
             onClick={hit}
             className="btn-gold py-3 text-sm tracking-wider"
           >
-            👆 HIT
+            <span className="flex items-center justify-center gap-1.5">
+              <span className="w-4 h-4">{Ic.hit}</span>HIT
+            </span>
           </button>
           <button
             type="button"
             onClick={stand}
             className="btn-outline py-3 text-sm tracking-wider"
           >
-            ✋ STAND
+            <span className="flex items-center justify-center gap-1.5">
+              <span className="w-4 h-4">{Ic.stand}</span>STAND
+            </span>
           </button>
           <button
             type="button"
@@ -1595,7 +2462,9 @@ function Blackjack({ coins, onResult }) {
             className="btn-outline py-3 text-sm tracking-wider"
             title="Double Down"
           >
-            ✌️ 2×
+            <span className="flex items-center justify-center gap-1">
+              <span className="w-4 h-4">{Ic.double}</span>2×
+            </span>
           </button>
         </div>
       )}
@@ -1605,7 +2474,9 @@ function Blackjack({ coins, onResult }) {
           onClick={reset}
           className="btn-gold w-full py-3 text-base tracking-[0.2em]"
         >
-          🔄 NEW HAND
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.replay}</span>NEW HAND
+          </span>
         </button>
       )}
     </div>
@@ -1853,12 +2724,12 @@ function Roulette({ coins, onResult }) {
         <div
           className={`fadeup rounded-xl px-4 py-2 text-center text-sm font-bold ${results.net > 0 ? "result-win glow-win" : results.net === 0 ? "result-push" : "result-lose shake"}`}
         >
-          <span className="mr-1">
+          <span className="w-3 h-3 inline-block">
             {numColor(results.num) === "red"
-              ? "🔴"
+              ? Ic.redDot
               : numColor(results.num) === "black"
-                ? "⚫"
-                : "🟢"}
+                ? Ic.blackDot
+                : Ic.greenDot}
           </span>
           <span className="font-mono">{results.num}</span>
           {"  "}
@@ -2015,9 +2886,9 @@ function Roulette({ coins, onResult }) {
           type="button"
           onClick={undoLast}
           disabled={spinning || totalBet === 0}
-          className="btn-outline px-3 py-2 text-sm"
+          className="btn-outline px-3 py-2"
         >
-          ↩
+          <span className="w-4 h-4 block">{Ic.undo}</span>
         </button>
         <button
           type="button"
@@ -2025,7 +2896,9 @@ function Roulette({ coins, onResult }) {
           disabled={spinning || totalBet === 0}
           className="btn-outline flex-1 py-2 text-sm"
         >
-          ✕ Clear
+          <span className="flex items-center justify-center gap-1.5">
+            <span className="w-3.5 h-3.5">{Ic.clear}</span>Clear
+          </span>
         </button>
         <button
           type="button"
@@ -2033,7 +2906,10 @@ function Roulette({ coins, onResult }) {
           disabled={spinning || totalBet === 0 || coins < totalBet}
           className="btn-gold flex-1 py-2 text-base tracking-widest"
         >
-          {spinning ? "🎡 Spinning..." : "🎡 SPIN"}
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.spin}</span>
+            {spinning ? "Spinning..." : "SPIN"}
+          </span>
         </button>
       </div>
       {history.length > 0 && (
@@ -2052,7 +2928,7 @@ function Roulette({ coins, onResult }) {
   );
 }
 
-// ── Plinko (fixed path + accurate peg tracking) ────────────────────────────────
+// ── Plinko (true physics — neutral ball, real bouncing) ────────────────────────
 const PLINKO_ROWS = 8;
 const PLINKO_MULTS = [10, 4, 2, 1, 0.5, 1, 2, 4, 10];
 
@@ -2063,13 +2939,15 @@ function Plinko({ coins, onResult }) {
   const [lastResult, setLastResult] = useState(null);
   const canvasRef = useRef(null);
   const animRef = useRef(null);
-  const W = 280,
-    H = 340,
-    topPad = 30,
-    botPad = 40;
-  const usableH = H - topPad - botPad;
 
-  // build peg grid: row r has (r+2) pegs
+  const W = 300,
+    H = 380,
+    topPad = 44,
+    botPad = 48;
+  const usableH = H - topPad - botPad;
+  const PEG_R = 5,
+    BALL_R = 8;
+
   const pegs = useMemo(() => {
     const list = [];
     for (let r = 0; r < PLINKO_ROWS; r++) {
@@ -2082,76 +2960,141 @@ function Plinko({ coins, onResult }) {
     return list;
   }, []);
 
-  const drawCanvas = useCallback(
-    (ballPos, ballTrail, slot) => {
+  const draw = useCallback(
+    (ball, trail, slot) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, W, H);
+
+      // background grid
+      ctx.strokeStyle = "#1a120033";
+      ctx.lineWidth = 0.5;
+      for (let x = 0; x <= W; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= H; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+
       // slots
       const slotW = W / PLINKO_MULTS.length;
       PLINKO_MULTS.forEach((mult, i) => {
         const x = i * slotW,
           isActive = i === slot,
           isHigh = mult >= 4;
-        ctx.fillStyle = isActive ? "#fbbf24" : isHigh ? "#92400e" : "#1a1400";
+        const g = ctx.createLinearGradient(x, H - botPad, x, H);
+        if (isActive) {
+          g.addColorStop(0, "#fbbf24");
+          g.addColorStop(1, "#d97706");
+        } else if (isHigh) {
+          g.addColorStop(0, "#92400e");
+          g.addColorStop(1, "#78350f");
+        } else {
+          g.addColorStop(0, "#1a1400");
+          g.addColorStop(1, "#0d0a00");
+        }
+        ctx.fillStyle = g;
         ctx.strokeStyle = isActive ? "#f59e0b" : "#3d2e00";
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(x + 2, H - 28, slotW - 4, 26, 4);
+        ctx.roundRect(x + 2, H - botPad + 2, slotW - 4, botPad - 4, 4);
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = isActive ? "#000" : isHigh ? "#fbbf24" : "#78350f";
         ctx.font = `bold ${mult >= 10 ? 10 : 9}px sans-serif`;
         ctx.textAlign = "center";
-        ctx.fillText(`${mult}x`, x + slotW / 2, H - 11);
+        ctx.fillText(`${mult}x`, x + slotW / 2, H - 14);
       });
+
       // pegs
       pegs.forEach(({ x, y }) => {
+        const halo = ctx.createRadialGradient(x, y, 0, x, y, PEG_R + 5);
+        halo.addColorStop(0, "#fbbf2433");
+        halo.addColorStop(1, "transparent");
         ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = "#d97706";
+        ctx.arc(x, y, PEG_R + 5, 0, Math.PI * 2);
+        ctx.fillStyle = halo;
         ctx.fill();
-        ctx.strokeStyle = "#fbbf24";
+        const pg = ctx.createRadialGradient(x - 1.5, y - 1.5, 0, x, y, PEG_R);
+        pg.addColorStop(0, "#fef3c7");
+        pg.addColorStop(0.4, "#fbbf24");
+        pg.addColorStop(1, "#92400e");
+        ctx.beginPath();
+        ctx.arc(x, y, PEG_R, 0, Math.PI * 2);
+        ctx.fillStyle = pg;
+        ctx.fill();
+        ctx.strokeStyle = "#d97706";
         ctx.lineWidth = 1;
         ctx.stroke();
       });
+
       // trail
-      if (ballTrail.length > 1) {
+      for (let i = 1; i < trail.length; i++) {
+        const alpha = (i / trail.length) * 0.5;
         ctx.beginPath();
-        ctx.moveTo(ballTrail[0].x, ballTrail[0].y);
-        ballTrail.forEach((p) => ctx.lineTo(p.x, p.y));
-        ctx.strokeStyle = "rgba(251,191,36,0.25)";
-        ctx.lineWidth = 2;
+        ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
+        ctx.lineTo(trail[i].x, trail[i].y);
+        ctx.strokeStyle = `rgba(251,191,36,${alpha})`;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
       }
+
       // ball
-      if (ballPos) {
+      if (ball) {
         ctx.beginPath();
-        ctx.arc(ballPos.x, ballPos.y, 7, 0, Math.PI * 2);
-        const g = ctx.createRadialGradient(
-          ballPos.x - 2,
-          ballPos.y - 2,
-          1,
-          ballPos.x,
-          ballPos.y,
-          7,
+        ctx.ellipse(
+          ball.x,
+          ball.y + BALL_R + 2,
+          BALL_R * 0.8,
+          3,
+          0,
+          0,
+          Math.PI * 2,
         );
-        g.addColorStop(0, "#fef3c7");
-        g.addColorStop(1, "#f59e0b");
-        ctx.fillStyle = g;
+        ctx.fillStyle = "rgba(0,0,0,0.4)";
         ctx.fill();
-        ctx.strokeStyle = "#d97706";
+        const bg = ctx.createRadialGradient(
+          ball.x - 2.5,
+          ball.y - 2.5,
+          1,
+          ball.x,
+          ball.y,
+          BALL_R,
+        );
+        bg.addColorStop(0, "#ffffff");
+        bg.addColorStop(0.2, "#fef3c7");
+        bg.addColorStop(0.6, "#f59e0b");
+        bg.addColorStop(1, "#d97706");
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
+        ctx.fillStyle = bg;
+        ctx.fill();
+        ctx.strokeStyle = "#92400e";
         ctx.lineWidth = 1.5;
         ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(ball.x - 2.5, ball.y - 2.5, 3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(ball.x + 1.5, ball.y - 1, 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.fill();
       }
     },
     [pegs],
   );
 
   useEffect(() => {
-    drawCanvas(null, [], null);
-  }, [drawCanvas]);
+    draw(null, [], null);
+  }, [draw]);
 
   const drop = () => {
     if (dropping || coins < bet) return;
@@ -2159,59 +3102,116 @@ function Plinko({ coins, onResult }) {
     setLastResult(null);
     setDropping(true);
 
-    // simulate accurate path: track column index within each row
-    const dirs = Array.from({ length: PLINKO_ROWS }, () =>
-      Math.random() < 0.5 ? -1 : 1,
-    );
-    // start at center peg of row 0 (row 0 has 2 pegs, start at peg 0)
-    let pegCol = 0;
-    const waypoints = [{ x: W / 2, y: 10 }];
-    for (let r = 0; r < PLINKO_ROWS; r++) {
-      const count = r + 2;
-      const spacing = W / (count + 1);
-      const px = spacing * (pegCol + 1);
-      const py = topPad + (usableH / PLINKO_ROWS) * (r + 0.5);
-      waypoints.push({ x: px, y: py });
-      SFX.plinko();
-      // move to next row: right = pegCol+1, left = pegCol (triangle grid)
-      if (dirs[r] === 1) pegCol = Math.min(pegCol + 1, r + 1);
-      // left: pegCol stays same (maps to left neighbor in next row)
-    }
-    // final slot: pegCol after 8 rows = slot index (0..8)
-    const slotIdx = Math.min(pegCol, PLINKO_MULTS.length - 1);
-    const slotW = W / PLINKO_MULTS.length;
-    waypoints.push({ x: slotIdx * slotW + slotW / 2, y: H - 28 });
+    // ── Pure physics — no pre-determined result ──
+    const GRAVITY = 0.32;
+    const RESTITUTION = 0.58; // energy kept on peg bounce
+    const PEG_FRIC = 0.82; // horizontal damping on peg hit
+    const WALL_REST = 0.35;
+    const FLOOR_Y = H - botPad + BALL_R;
 
-    let wpIdx = 0,
-      progress = 0;
+    // ball starts at top center, tiny random offset so it's not perfectly symmetric
+    const ball = {
+      x: W / 2 + (Math.random() - 0.5) * 4,
+      y: topPad - 20,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: 0.5,
+    };
+
     const trail = [];
-    const animate = () => {
-      if (wpIdx >= waypoints.length - 1) {
-        setActiveSlot(slotIdx);
-        const mult = PLINKO_MULTS[slotIdx];
-        const net = Math.floor(bet * mult) - bet;
-        setLastResult({ mult, net });
-        onResult(net);
-        net >= 0 ? (mult >= 4 ? SFX.bigwin() : SFX.win()) : SFX.lose();
-        setDropping(false);
-        drawCanvas(null, [], slotIdx);
+    let lastPegSound = 0;
+    let floorBounces = 0;
+
+    const simulate = (ts) => {
+      // gravity
+      ball.vy += GRAVITY;
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      // wall collisions
+      if (ball.x - BALL_R < 1) {
+        ball.x = 1 + BALL_R;
+        ball.vx = Math.abs(ball.vx) * WALL_REST;
+      }
+      if (ball.x + BALL_R > W - 1) {
+        ball.x = W - 1 - BALL_R;
+        ball.vx = -Math.abs(ball.vx) * WALL_REST;
+      }
+
+      // peg collisions — check every peg every frame
+      for (const peg of pegs) {
+        const dx = ball.x - peg.x,
+          dy = ball.y - peg.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minD = BALL_R + PEG_R;
+        if (dist < minD && dist > 0.001) {
+          const nx = dx / dist,
+            ny = dy / dist;
+          // push ball out of overlap
+          ball.x = peg.x + nx * (minD + 0.5);
+          ball.y = peg.y + ny * (minD + 0.5);
+          // reflect velocity along collision normal
+          const dot = ball.vx * nx + ball.vy * ny;
+          ball.vx = (ball.vx - 2 * dot * nx) * RESTITUTION;
+          ball.vy = (ball.vy - 2 * dot * ny) * RESTITUTION;
+          // horizontal friction + small random nudge (natural spread)
+          ball.vx *= PEG_FRIC;
+          ball.vx += (Math.random() - 0.5) * 0.9;
+          // clamp so ball doesn't fly sideways
+          ball.vx = Math.max(-4.5, Math.min(4.5, ball.vx));
+          if (ts - lastPegSound > 80) {
+            SFX.plinko();
+            lastPegSound = ts;
+          }
+        }
+      }
+
+      // floor bounce
+      if (ball.y + BALL_R >= FLOOR_Y) {
+        ball.y = FLOOR_Y - BALL_R;
+        ball.vy = -Math.abs(ball.vy) * 0.32;
+        ball.vx *= 0.78;
+        floorBounces++;
+      }
+
+      // trail
+      trail.push({ x: ball.x, y: ball.y });
+      if (trail.length > 35) trail.shift();
+      draw({ x: ball.x, y: ball.y }, trail, null);
+
+      // settle: on floor, slow enough, bounced at least twice
+      const speed = Math.sqrt(ball.vx ** 2 + ball.vy ** 2);
+      if (floorBounces >= 2 && speed < 0.5 && ball.y + BALL_R >= FLOOR_Y - 2) {
+        // slot determined by where ball actually stopped — fully neutral
+        const slotW = W / PLINKO_MULTS.length;
+        const rawSlot = Math.floor(ball.x / slotW);
+        const slotIdx = Math.max(0, Math.min(PLINKO_MULTS.length - 1, rawSlot));
+        const targetX = slotIdx * slotW + slotW / 2;
+        const startX = ball.x;
+        let t = 0;
+        const slide = () => {
+          t += 0.06;
+          const cx = startX + (targetX - startX) * Math.min(t, 1);
+          draw({ x: cx, y: FLOOR_Y - BALL_R }, [], slotIdx);
+          if (t < 1) {
+            animRef.current = requestAnimationFrame(slide);
+            return;
+          }
+          const mult = PLINKO_MULTS[slotIdx];
+          const net = Math.floor(bet * mult) - bet;
+          setLastResult({ mult, net });
+          setActiveSlot(slotIdx);
+          onResult(net);
+          net >= 0 ? (mult >= 4 ? SFX.bigwin() : SFX.win()) : SFX.lose();
+          setDropping(false);
+        };
+        animRef.current = requestAnimationFrame(slide);
         return;
       }
-      progress += 0.045 + wpIdx * 0.003;
-      if (progress >= 1) {
-        progress = 0;
-        wpIdx++;
-      }
-      const from = waypoints[wpIdx],
-        to = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
-      const x = from.x + (to.x - from.x) * progress;
-      const y = from.y + (to.y - from.y) * progress;
-      trail.push({ x, y });
-      if (trail.length > 20) trail.shift();
-      drawCanvas({ x, y }, [...trail], null);
-      animRef.current = requestAnimationFrame(animate);
+
+      animRef.current = requestAnimationFrame(simulate);
     };
-    animRef.current = requestAnimationFrame(animate);
+
+    animRef.current = requestAnimationFrame(simulate);
   };
 
   useEffect(() => () => cancelAnimationFrame(animRef.current), []);
@@ -2223,7 +3223,7 @@ function Plinko({ coins, onResult }) {
           Plinko
         </p>
         <p className="mt-0.5 text-[10px] text-yellow-900">
-          Drop the ball — land on high multipliers!
+          Drop the ball — watch it bounce!
         </p>
       </div>
       <div className="plinko-canvas-wrap">
@@ -2257,7 +3257,10 @@ function Plinko({ coins, onResult }) {
         disabled={dropping || coins < bet}
         className="btn-gold w-full py-3 text-base tracking-[0.2em]"
       >
-        {dropping ? "🎯  Dropping..." : "🎯  DROP BALL"}
+        <span className="flex items-center justify-center gap-2">
+          <span className="w-4 h-4">{Ic.drop}</span>
+          {dropping ? "Dropping..." : "DROP BALL"}
+        </span>
       </button>
     </div>
   );
@@ -2500,14 +3503,19 @@ function CardWar({ coins, onResult }) {
               disabled={coins < bet}
               className="btn-gold flex-1 py-2 text-sm"
             >
-              ⚔️ WAR!
+              <span className="flex items-center justify-center gap-1.5">
+                <span className="w-4 h-4">{Ic.war}</span>WAR!
+              </span>
             </button>
             <button
               type="button"
               onClick={surrender}
               className="btn-outline flex-1 py-2 text-sm"
             >
-              🏳️ Surrender (-{Math.floor(bet / 2)})
+              <span className="flex items-center justify-center gap-1.5">
+                <span className="w-4 h-4">{Ic.surrender}</span>Surrender (-
+                {Math.floor(bet / 2)})
+              </span>
             </button>
           </div>
         </div>
@@ -2520,7 +3528,9 @@ function CardWar({ coins, onResult }) {
           disabled={coins < bet}
           className="btn-gold w-full py-3 text-base tracking-[0.2em]"
         >
-          🃏 DEAL
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.deal}</span>DEAL
+          </span>
         </button>
       )}
       {phase === "done" && (
@@ -2529,24 +3539,554 @@ function CardWar({ coins, onResult }) {
           onClick={reset}
           className="btn-gold w-full py-3 text-base tracking-[0.2em]"
         >
-          🔄 PLAY AGAIN
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.replay}</span>PLAY AGAIN
+          </span>
         </button>
       )}
     </div>
   );
 }
 
+// ── Game Icons (professional SVG) ─────────────────────────────────────────────
+const GameIcons = {
+  slot: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="2"
+        y="5"
+        width="20"
+        height="15"
+        rx="2.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="2"
+        y="5"
+        width="20"
+        height="4.5"
+        rx="2.5"
+        fill="currentColor"
+        fillOpacity="0.18"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="4.5"
+        y="11.5"
+        width="4"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <rect
+        x="10"
+        y="11.5"
+        width="4"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <rect
+        x="15.5"
+        y="11.5"
+        width="4"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <circle cx="6.5" cy="14" r="1" fill="currentColor" />
+      <line
+        x1="10.8"
+        y1="12.8"
+        x2="13.2"
+        y2="12.8"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <line
+        x1="10.8"
+        y1="14"
+        x2="13.2"
+        y2="14"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <line
+        x1="10.8"
+        y1="15.2"
+        x2="13.2"
+        y2="15.2"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <path
+        d="M17.5 13l1 1-1 1"
+        stroke="currentColor"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <line
+        x1="3"
+        y1="14"
+        x2="21"
+        y2="14"
+        stroke="currentColor"
+        strokeWidth="0.7"
+        strokeDasharray="1.5 1"
+        opacity="0.5"
+      />
+      <path
+        d="M22 7.5 L22 11"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="22" cy="12" r="1.3" fill="currentColor" />
+    </svg>
+  ),
+  coin: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle
+        cx="12"
+        cy="12"
+        r="7"
+        stroke="currentColor"
+        strokeWidth="0.7"
+        opacity="0.4"
+      />
+      <path
+        d="M12 7v1.2M12 15.8V17"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M10.2 9.8c0-1 .8-1.8 1.8-1.8s1.8.8 1.8 1.8c0 .8-.6 1.3-1.8 1.6-1.2.3-1.8.8-1.8 1.6 0 1 .8 1.8 1.8 1.8s1.8-.8 1.8-1.8"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8 5.5 C6 7 4.5 9.3 4.5 12"
+        stroke="currentColor"
+        strokeWidth="0.8"
+        strokeLinecap="round"
+        opacity="0.35"
+      />
+    </svg>
+  ),
+  lucky: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="2.5"
+        y="2.5"
+        width="19"
+        height="19"
+        rx="4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="2.5"
+        y="2.5"
+        width="19"
+        height="19"
+        rx="4"
+        fill="currentColor"
+        fillOpacity="0.06"
+      />
+      <circle cx="7.5" cy="7.5" r="1.6" fill="currentColor" />
+      <circle cx="16.5" cy="7.5" r="1.6" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" />
+      <circle cx="7.5" cy="16.5" r="1.6" fill="currentColor" />
+      <circle cx="16.5" cy="16.5" r="1.6" fill="currentColor" />
+    </svg>
+  ),
+  highlow: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="2"
+        y="3.5"
+        width="9.5"
+        height="13"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M5 8.5h3.5M5 11h2.5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M7 14.5 L7 16.5 L5.5 15 M7 16.5 L8.5 15"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect
+        x="12.5"
+        y="7.5"
+        width="9.5"
+        height="13"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M15.5 12.5h3.5M15.5 15h2.5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M17 10.5 L17 8.5 L15.5 10 M17 8.5 L18.5 10"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  crash: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line
+        x1="3"
+        y1="20"
+        x2="21"
+        y2="20"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <line
+        x1="3"
+        y1="20"
+        x2="3"
+        y2="4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3 20 C5 20 7 18 10 14 C13 10 15 7 18 5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M3 20 C5 20 7 18 10 14 C13 10 15 7 18 5 L18 20 Z"
+        fill="currentColor"
+        fillOpacity="0.1"
+      />
+      <circle cx="18" cy="5" r="2" fill="currentColor" />
+      <line
+        x1="18"
+        y1="2.5"
+        x2="18"
+        y2="3.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="20.3"
+        y1="3.2"
+        x2="19.5"
+        y2="4"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="21"
+        y1="5"
+        x2="20"
+        y2="5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  bj: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="8.5"
+        y="5"
+        width="11"
+        height="15"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="currentColor"
+        fillOpacity="0.08"
+      />
+      <rect
+        x="4.5"
+        y="4"
+        width="11"
+        height="15"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="#0d0a00"
+      />
+      <path
+        d="M9.5 15.5 L11.5 8.5 L13.5 15.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <line
+        x1="10.2"
+        y1="13"
+        x2="12.8"
+        y2="13"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M9 17.5 L9.5 17 L10 17.5"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  roulette: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle
+        cx="12"
+        cy="12"
+        r="6.5"
+        stroke="currentColor"
+        strokeWidth="0.8"
+        opacity="0.5"
+      />
+      <circle cx="12" cy="12" r="2.8" stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" />
+      <line
+        x1="12"
+        y1="2.5"
+        x2="12"
+        y2="5.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="12"
+        y1="18.5"
+        x2="12"
+        y2="21.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="2.5"
+        y1="12"
+        x2="5.5"
+        y2="12"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="18.5"
+        y1="12"
+        x2="21.5"
+        y2="12"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="5.1"
+        y1="5.1"
+        x2="7.2"
+        y2="7.2"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="16.8"
+        y1="16.8"
+        x2="18.9"
+        y2="18.9"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="18.9"
+        y1="5.1"
+        x2="16.8"
+        y2="7.2"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="7.2"
+        y1="16.8"
+        x2="5.1"
+        y2="18.9"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="4.5" r="1.2" fill="currentColor" />
+    </svg>
+  ),
+  plinko: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="2.8" r="2" fill="currentColor" />
+      <circle cx="8" cy="7.5" r="1.3" fill="currentColor" />
+      <circle cx="16" cy="7.5" r="1.3" fill="currentColor" />
+      <circle cx="5.5" cy="12.5" r="1.3" fill="currentColor" />
+      <circle cx="12" cy="12.5" r="1.3" fill="currentColor" />
+      <circle cx="18.5" cy="12.5" r="1.3" fill="currentColor" />
+      <path
+        d="M12 4.8 L9 6.3 L6.8 11.2"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeDasharray="1.5 1.2"
+        opacity="0.45"
+      />
+      <rect
+        x="2"
+        y="18.5"
+        width="5.5"
+        height="3.5"
+        rx="1.2"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <rect
+        x="9.2"
+        y="18.5"
+        width="5.5"
+        height="3.5"
+        rx="1.2"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        fill="currentColor"
+        fillOpacity="0.15"
+      />
+      <rect
+        x="16.5"
+        y="18.5"
+        width="5.5"
+        height="3.5"
+        rx="1.2"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+    </svg>
+  ),
+  war: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M4.5 19.5 L16 8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 8 L18.5 5.5 L19 5 L18.5 5.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M18 4 L20 6 L18 4z" fill="currentColor" />
+      <rect
+        x="9.5"
+        y="11.5"
+        width="5"
+        height="2"
+        rx="1"
+        transform="rotate(-45 9.5 11.5)"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="0.5"
+      />
+      <path
+        d="M4.5 19.5 L3 21"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M19.5 19.5 L8 8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
+      <path
+        d="M8 8 L5.5 5.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
+      <path d="M6 4 L4 6 L6 4z" fill="currentColor" opacity="0.5" />
+      <rect
+        x="13.5"
+        y="11.5"
+        width="5"
+        height="2"
+        rx="1"
+        transform="rotate(45 13.5 11.5)"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="0.5"
+        opacity="0.5"
+      />
+      <path
+        d="M19.5 19.5 L21 21"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
+    </svg>
+  ),
+};
+
 // ── Main App ───────────────────────────────────────────────────────────────────
 const GAMES = [
-  { id: "slot", label: "🎰 Slots", emoji: "🎰" },
-  { id: "coin", label: "🪙 Coin Flip", emoji: "🪙" },
-  { id: "lucky", label: "🎲 Lucky No.", emoji: "🎲" },
-  { id: "highlow", label: "🃏 High/Low", emoji: "🃏" },
-  { id: "crash", label: "🚀 Crash", emoji: "🚀" },
-  { id: "bj", label: "🂡 Blackjack", emoji: "🂡" },
-  { id: "roulette", label: "🎡 Roulette", emoji: "🎡" },
-  { id: "plinko", label: "🎯 Plinko", emoji: "🎯" },
-  { id: "war", label: "⚔️ War", emoji: "⚔️" },
+  { id: "slot", label: "Slots" },
+  { id: "coin", label: "Coin Flip" },
+  { id: "lucky", label: "Dice" },
+  { id: "highlow", label: "High/Low" },
+  { id: "crash", label: "Crash" },
+  { id: "bj", label: "Blackjack" },
+  { id: "roulette", label: "Roulette" },
+  { id: "plinko", label: "Plinko" },
+  { id: "war", label: "War" },
 ];
 
 export default function App() {
@@ -2589,13 +4129,11 @@ export default function App() {
   const toastRef = useRef(null);
   const achieveQueue = useRef([]);
 
-  // daily bonus check
   useEffect(() => {
     const last = localStorage.getItem(DAILY_KEY);
     if (last !== new Date().toDateString()) setShowDaily(true);
   }, []);
 
-  // persist
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
@@ -2619,7 +4157,6 @@ export default function App() {
     dailyStreak,
   ]);
 
-  // keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
       if (e.target.matches("input,textarea,button,select")) return;
@@ -2639,7 +4176,6 @@ export default function App() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // achievement queue
   useEffect(() => {
     if (pendingAchieve) return;
     if (achieveQueue.current.length > 0) {
@@ -2666,7 +4202,6 @@ export default function App() {
         { delta, game: activeGame, time: Date.now() },
         ...h.slice(0, 19),
       ]);
-
       let newStats;
       setStats((s) => {
         const streak = delta > 0 ? s.currentStreak + 1 : 0;
@@ -2683,7 +4218,6 @@ export default function App() {
         };
         return newStats;
       });
-
       sessionRef.current.played++;
       if (delta > 0) {
         sessionRef.current.wins++;
@@ -2692,11 +4226,8 @@ export default function App() {
           delta,
         );
       }
-
       showToast(delta > 0 ? `+${delta} coins` : `${delta} coins`, delta > 0);
       if (delta >= BIG_WIN_THRESHOLD) setBigWin(delta);
-
-      // achievements
       if (newStats) {
         const event = {
           type: eventType ?? (delta > 0 ? "win" : "lose"),
@@ -2716,9 +4247,7 @@ export default function App() {
           return cur;
         });
       }
-
-      // session summary on bust
-      if (newCoins === 0) {
+      if (newCoins === 0)
         setTimeout(
           () =>
             setShowSession({
@@ -2730,7 +4259,6 @@ export default function App() {
             }),
           800,
         );
-      }
     },
     [activeGame, showToast],
   );
@@ -2745,7 +4273,7 @@ export default function App() {
     setHighScore((h) => Math.max(h, coins + bonus));
     SFX.bonus();
     showToast(`+${bonus} daily bonus!`, true);
-    if (streak >= 7) {
+    if (streak >= 7)
       setAchievements((cur) => {
         const n = checkAchievements(cur, {
           type: "daily",
@@ -2762,7 +4290,6 @@ export default function App() {
         }
         return cur;
       });
-    }
   };
 
   const resetCoins = () => {
@@ -2845,7 +4372,6 @@ export default function App() {
       )}
 
       <div className="casino-layout relative">
-        {/* header */}
         <div className="mb-5 text-center sm:mb-7">
           <div className="mb-2 flex items-center justify-center gap-3">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-yellow-800/60" />
@@ -2874,7 +4400,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* balance bar */}
         <div className="balance-bar mb-4 flex items-center gap-3 px-4 py-3 sm:px-5 sm:py-4">
           <div className="flex-1">
             <p
@@ -2893,7 +4418,10 @@ export default function App() {
                 textShadow: "0 0 12px #f59e0b44",
               }}
             >
-              🪙 {coins.toLocaleString()}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-5 h-5 inline-block">{Ic.coin}</span>
+                {coins.toLocaleString()}
+              </span>
             </p>
           </div>
           <div className="h-8 w-px bg-gradient-to-b from-transparent via-yellow-900 to-transparent" />
@@ -2911,17 +4439,20 @@ export default function App() {
               className="mt-0.5 font-bold text-yellow-700"
               style={{ fontSize: "clamp(1rem,4vw,1.2rem)" }}
             >
-              🏆 {highScore.toLocaleString()}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-4 h-4 inline-block">{Ic.best}</span>
+                {highScore.toLocaleString()}
+              </span>
             </p>
           </div>
           <div className="flex flex-col gap-1">
             <button
               type="button"
               onClick={() => setShowStats(true)}
-              className="btn-outline px-2 py-1 text-xs"
+              className="btn-outline px-2 py-1"
               title="Stats (S)"
             >
-              📊
+              <span className="w-4 h-4 block">{Ic.stats}</span>
             </button>
             <button
               type="button"
@@ -2929,12 +4460,13 @@ export default function App() {
               className="btn-outline px-2 py-1 text-xs"
               title="Mute (M)"
             >
-              {muted ? "🔇" : "🔊"}
+              <span className="w-4 h-4 block">
+                {muted ? Ic.muted : Ic.mute}
+              </span>
             </button>
           </div>
         </div>
 
-        {/* achievements strip */}
         {achievements.length > 0 && (
           <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1">
             {achievements.slice(-8).map((id) => {
@@ -2955,7 +4487,6 @@ export default function App() {
           </div>
         )}
 
-        {/* game tabs */}
         <div className="mb-3 grid grid-cols-3 gap-1 sm:gap-1.5">
           {GAMES.map((g) => (
             <button
@@ -2964,15 +4495,12 @@ export default function App() {
               onClick={() => switchGame(g.id)}
               className={`game-tab ${activeGame === g.id ? "active" : ""}`}
             >
-              <span style={{ fontSize: "clamp(14px,4vw,18px)" }}>
-                {g.emoji}
-              </span>
-              <span>{g.label.split(" ").slice(1).join(" ")}</span>
+              <span className="game-tab-icon">{GameIcons[g.id]}</span>
+              <span>{g.label}</span>
             </button>
           ))}
         </div>
 
-        {/* game panel */}
         <div
           className={`card-glass rounded-2xl shadow-[0_0_40px_#f59e0b08] ${prevGame ? "fadeup" : ""}`}
           style={{ padding: "clamp(14px,4vw,24px)" }}
@@ -3008,7 +4536,6 @@ export default function App() {
           <div className="mt-4 h-px bg-gradient-to-r from-transparent via-yellow-900/40 to-transparent" />
         </div>
 
-        {/* history + mini chart */}
         {history.length > 0 && (
           <div className="mt-3">
             <div className="mb-1 flex items-center justify-between">
@@ -3048,11 +4575,12 @@ export default function App() {
             onClick={resetCoins}
             className="btn-outline mt-4 w-full py-2 text-sm"
           >
-            🔄 Reload 500 coins
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4">{Ic.reload}</span>Reload 500 coins
+            </span>
           </button>
         )}
 
-        {/* keyboard hints */}
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           {[
             ["Space", "Spin"],

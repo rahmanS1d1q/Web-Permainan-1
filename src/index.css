@@ -615,3 +615,240 @@ body {
   z-index: 2;
   pointer-events: none;
 }
+
+/* ── 3D Coin ── */
+.coin-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coin-ring {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #d97706;
+  box-shadow:
+    0 0 0 2px #78350f,
+    0 0 0 4px #d97706,
+    inset 0 2px 4px #fbbf2444,
+    0 8px 32px #00000088;
+  background: radial-gradient(
+    circle at 35% 35%,
+    #fbbf24,
+    #d97706 40%,
+    #92400e 80%,
+    #78350f
+  );
+  transition:
+    box-shadow 0.3s,
+    border-color 0.3s;
+}
+
+.coin-ring.ring-win {
+  border-color: #fbbf24;
+  box-shadow:
+    0 0 0 2px #f59e0b,
+    0 0 0 4px #fbbf24,
+    0 0 30px #f59e0b88,
+    inset 0 2px 4px #fbbf2466,
+    0 8px 32px #00000088;
+}
+
+.coin-ring.ring-lose {
+  border-color: #7f1d1d;
+  box-shadow:
+    0 0 0 2px #991b1b,
+    0 0 0 4px #7f1d1d,
+    inset 0 2px 4px #ef444422,
+    0 8px 32px #00000088;
+  background: radial-gradient(
+    circle at 35% 35%,
+    #b45309,
+    #92400e 40%,
+    #78350f 80%,
+    #451a03
+  );
+}
+
+.coin-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 1px solid #f59e0b44;
+  background: radial-gradient(circle at 40% 30%, #fbbf2422, transparent 60%);
+}
+
+.coin-symbol {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px #00000066);
+}
+
+.coin-label {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #fef3c7;
+  text-shadow: 0 1px 2px #00000088;
+}
+
+/* back face slightly different tint */
+.coin-back .coin-ring {
+  background: radial-gradient(
+    circle at 65% 35%,
+    #d97706,
+    #b45309 40%,
+    #78350f 80%,
+    #451a03
+  );
+}
+
+/* ── Dice shake animation ── */
+@keyframes dice-shake {
+  0%,
+  100% {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateX(0);
+  }
+  20% {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+      translateX(-8px) rotate(-5deg);
+  }
+  40% {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateX(8px)
+      rotate(5deg);
+  }
+  60% {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+      translateX(-5px) rotate(-3deg);
+  }
+  80% {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateX(5px)
+      rotate(3deg);
+  }
+}
+
+/* ── 3D Dice Cube ── */
+.dice-cube {
+  position: relative;
+}
+
+.dice-face {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  top: 0;
+  left: 0;
+}
+
+.dice-face-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  border: 2px solid #92400e;
+  background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 40%, #d97706 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.3),
+    0 0 0 1px #78350f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  transition: box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* top-left highlight */
+.dice-face-inner::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 40%;
+  bottom: 40%;
+  border-radius: 10px 4px 4px 4px;
+  background: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+
+.dice-face-inner.dice-win {
+  background: linear-gradient(135deg, #fef9c3 0%, #fde047 40%, #ca8a04 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 2px #fbbf24,
+    0 0 20px #f59e0b88;
+}
+
+.dice-face-inner.dice-lose {
+  background: linear-gradient(135deg, #fde68a 0%, #b45309 60%, #78350f 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+    0 0 0 2px #7f1d1d;
+}
+
+.dice-dots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  gap: 2px;
+}
+
+.dice-dot-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dice-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #92400e, #451a03);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.dice-label {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #92400e;
+  opacity: 0.6;
+}
+
+/* ── Game tab icon ── */
+.game-tab-icon {
+  width: clamp(18px, 5vw, 22px);
+  height: clamp(18px, 5vw, 22px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.game-tab-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.game-tab.active .game-tab-icon svg {
+  stroke: #000;
+}
