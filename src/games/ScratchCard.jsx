@@ -3,16 +3,16 @@ import { Ic } from "../icons.jsx";
 import { SFX } from "../sounds.js";
 import { haptic } from "../constants.js";
 import { BetSelector } from "../ui/modals.jsx";
+import { SLOT_SYMBOLS } from "../slotSymbols.jsx";
 
-const SCRATCH_SYMBOLS = ["💎", "7", "⭐", "🍒", "🍋", "🍊"];
-// Payouts tuned for ~80% RTP, win chance ~18%
+const SCRATCH_SYMS = ["diamond", "bar", "star", "cherry", "lemon", "bell"];
 const SCRATCH_PAYOUTS = {
-  "💎💎💎": 35,
-  777: 20,
-  "⭐⭐⭐": 10,
-  "🍒🍒🍒": 5,
-  "🍋🍋🍋": 3,
-  "🍊🍊🍊": 2,
+  "diamond-diamond-diamond": 35,
+  "bar-bar-bar": 20,
+  "star-star-star": 10,
+  "cherry-cherry-cherry": 5,
+  "lemon-lemon-lemon": 3,
+  "bell-bell-bell": 2,
 };
 
 const LINES = [
@@ -30,7 +30,7 @@ function calcPayout(cells) {
   let best = 0;
   for (const [a, b, c] of LINES) {
     if (cells[a] === cells[b] && cells[b] === cells[c]) {
-      const key = cells[a].repeat(3);
+      const key = `${cells[a]}-${cells[a]}-${cells[a]}`;
       const p = SCRATCH_PAYOUTS[key] ?? 0;
       if (p > best) best = p;
     }
@@ -61,13 +61,11 @@ export function ScratchCard({ coins, onResult }) {
     SFX.click();
     const syms = Array.from(
       { length: 9 },
-      () => SCRATCH_SYMBOLS[Math.floor(Math.random() * SCRATCH_SYMBOLS.length)],
+      () => SCRATCH_SYMS[Math.floor(Math.random() * SCRATCH_SYMS.length)],
     );
-    // 18% chance to force a winning line
     if (Math.random() < 0.18) {
       const winSym =
-        SCRATCH_SYMBOLS[Math.floor(Math.random() * SCRATCH_SYMBOLS.length)];
-      // pick a random winning line and set all 3 cells
+        SCRATCH_SYMS[Math.floor(Math.random() * SCRATCH_SYMS.length)];
       const line = LINES[Math.floor(Math.random() * LINES.length)];
       line.forEach((i) => {
         syms[i] = winSym;
@@ -133,9 +131,11 @@ export function ScratchCard({ coins, onResult }) {
                     }`}
                 >
                   {isRevealed ? (
-                    sym
+                    <div className="w-10 h-10 mx-auto">{SLOT_SYMBOLS[sym]}</div>
                   ) : (
-                    <span className="text-yellow-800 text-xs">?</span>
+                    <span className="text-yellow-800 text-xs font-bold tracking-widest">
+                      ?
+                    </span>
                   )}
                 </button>
               );

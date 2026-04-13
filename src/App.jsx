@@ -20,6 +20,11 @@ import {
   loadState,
   loadWeekly,
   TUTORIAL_STEPS,
+  getDailyMissions,
+  saveDailyMissions,
+  getPrestige,
+  savePrestige,
+  PRESTIGE_BONUSES,
 } from "./constants.js";
 import { SFX, getMuted, setMuted } from "./sounds.js";
 import { Ic, GameIcons } from "./icons.jsx";
@@ -34,6 +39,9 @@ import {
   BetConfirm,
   MiniChart,
   TutorialModal,
+  DailyMissionsModal,
+  PrestigeModal,
+  AutoBetModal,
 } from "./ui/modals.jsx";
 import { XPBar, WeeklyWidget } from "./ui/widgets.jsx";
 import { SlotMachine } from "./games/SlotMachine.jsx";
@@ -48,13 +56,21 @@ import { CardWar } from "./games/CardWar.jsx";
 import { Baccarat } from "./games/Baccarat.jsx";
 import { Keno } from "./games/Keno.jsx";
 import { ScratchCard } from "./games/ScratchCard.jsx";
+import { TexasPoker } from "./games/TexasPoker.jsx";
+import { WheelOfFortune } from "./games/WheelOfFortune.jsx";
+import { DragonTiger } from "./games/DragonTiger.jsx";
+import { VideoPoker } from "./games/VideoPoker.jsx";
+
+const ACH_ICONS_MAP = {};
 
 export default function App() {
   const saved = loadState();
-  const [coins, setCoins] = useState(saved?.coins ?? STARTING_COINS);
-  const [highScore, setHighScore] = useState(
-    saved?.highScore ?? STARTING_COINS,
-  );
+  const prestigeData = getPrestige();
+  const prestigeBonus = PRESTIGE_BONUSES[prestigeData.level - 1];
+  const startCoins = prestigeBonus ? prestigeBonus.startCoins : STARTING_COINS;
+
+  const [coins, setCoins] = useState(saved?.coins ?? startCoins);
+  const [highScore, setHighScore] = useState(saved?.highScore ?? startCoins);
   const [activeGame, setActiveGame] = useState("slot");
   const [prevGame, setPrevGame] = useState(null);
   const [history, setHistory] = useState(saved?.history ?? []);
@@ -81,12 +97,9 @@ export default function App() {
       byGame: {},
     },
   );
-  // XP / Level
   const [xp, setXp] = useState(saved?.xp ?? 0);
   const [levelUpMsg, setLevelUpMsg] = useState(null);
-  // Tutorial
-  const [tutStep, setTutStep] = useState(null); // null = done/skipped
-  // Weekly challenge
+  const [tutStep, setTutStep] = useState(null);
   const weeklyChallenge = getWeeklyChallenge();
   const savedWeekly = loadWeekly();
   const [weeklyProgress, setWeeklyProgress] = useState(
@@ -96,11 +109,26 @@ export default function App() {
     savedWeekly?.claimed ?? false,
   );
   const [showWeekly, setShowWeekly] = useState(false);
-  // Per-game stats
   const [gameStats, setGameStats] = useState(saved?.gameStats ?? {});
+  // New features
+  const [showMissions, setShowMissions] = useState(false);
+  const [dailyMissions, setDailyMissions] = useState(
+    () => getDailyMissions().missions,
+  );
+  const [showPrestige, setShowPrestige] = useState(false);
+  const [prestige, setPrestige] = useState(prestigeData);
+  const [showAutoBet, setShowAutoBet] = useState(false);
+  const [autoBetSettings, setAutoBetSettings] = useState({
+    stopLoss: null,
+    takeProfit: null,
+    turbo: false,
+  });
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("casino-theme") || "dark",
+  );
 
   const sessionRef = useRef({
-    startCoins: saved?.coins ?? STARTING_COINS,
+    startCoins: saved?.coins ?? startCoins,
     played: 0,
     wins: 0,
     bestWin: 0,
@@ -108,6 +136,12 @@ export default function App() {
   const toastRef = useRef(null);
   const achieveQueue = useRef([]);
   const gamePanelRef = useRef(null);
+  const coinsRef = useRef(coins);
+  const missionCompletedRef = useRef(0);
+
+  useEffect(() => {
+    coinsRef.current = coins;
+  }, [coins]);
 
   useEffect(() => {
     const last = localStorage.getItem(DAILY_KEY);
@@ -142,6 +176,11 @@ export default function App() {
   ]);
 
   useEffect(() => {
+    localStorage.setItem("casino-theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
     const handler = (e) => {
       if (e.target.matches("input,textarea,button,select")) return;
       if (e.key === "m" || e.key === "M") {
@@ -151,6 +190,7 @@ export default function App() {
       }
       if (e.key === "s" || e.key === "S") setShowStats((v) => !v);
       if (e.key === "w" || e.key === "W") setShowWeekly((v) => !v);
+      if (e.key === "d" || e.key === "D") setShowMissions((v) => !v);
       const idx = e.key === "0" ? 9 : parseInt(e.key) - 1;
       if (!isNaN(idx) && idx >= 0 && idx < GAMES.length) {
         setActiveGame(GAMES[idx].id);
@@ -161,13 +201,11 @@ export default function App() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // Tutorial on first visit
   useEffect(() => {
     const done = localStorage.getItem(TUTORIAL_KEY);
     if (!done) setTutStep(0);
   }, []);
 
-  // Weekly challenge persist
   useEffect(() => {
     localStorage.setItem(
       WEEKLY_KEY,
@@ -193,33 +231,36 @@ export default function App() {
     toastRef.current = setTimeout(() => setToast(null), 2000);
   }, []);
 
-  // Simpan coins di ref agar handleResult selalu dapat nilai terbaru
-  const coinsRef = useRef(coins);
-  useEffect(() => {
-    coinsRef.current = coins;
-  }, [coins]);
+  // Update daily missions progress
+  const updateMissions = useCallback((eventType, delta, game) => {
+    setDailyMissions((prev) => {
+      const updated = prev.map((m) => {
+        if (m.claimed || m.progress >= m.target) return m;
+        let inc = 0;
+        if (m.type === "wins" && delta > 0) inc = 1;
+        if (m.type === "played") inc = 1;
+        if (m.type === "earned" && delta > 0) inc = delta;
+        if (m.type === "streak" && delta > 0) inc = 1;
+        if (m.type === `game_${game}`) inc = 1;
+        if (m.type === "cashout_crash" && eventType === "cashout") inc = 1;
+        return { ...m, progress: Math.min(m.progress + inc, m.target) };
+      });
+      const d = getDailyMissions();
+      saveDailyMissions({ ...d, missions: updated });
+      return updated;
+    });
+  }, []);
 
   const handleResult = useCallback(
     (delta, eventType) => {
-      // Pakai coinsRef.current — selalu nilai terbaru, tidak pernah stale
       const currentCoins = coinsRef.current;
       const nextCoins = Math.max(0, currentCoins + delta);
-
-      console.log(
-        `[handleResult] coins=${currentCoins} delta=${delta} next=${nextCoins}`,
-      );
-
-      // 1. Set coins langsung — nilai sudah dihitung dengan benar
       setCoins(nextCoins);
       setHighScore((h) => Math.max(h, nextCoins));
-
-      // 2. History
       setHistory((h) => [
         { delta, game: activeGame, time: Date.now() },
         ...h.slice(0, 19),
       ]);
-
-      // 3. Per-game stats
       setGameStats((gs) => {
         const g = gs[activeGame] ?? { played: 0, wins: 0, totalWon: 0 };
         return {
@@ -231,8 +272,6 @@ export default function App() {
           },
         };
       });
-
-      // 4. Global stats
       let newStats;
       setStats((s) => {
         const streak = delta > 0 ? s.currentStreak + 1 : 0;
@@ -249,9 +288,13 @@ export default function App() {
         };
         return newStats;
       });
-
-      // 5. XP
-      const xpGain = XP_PER_GAME + (delta > 0 ? XP_PER_WIN : 0);
+      const xpMult =
+        prestige.level > 0
+          ? (PRESTIGE_BONUSES[prestige.level - 1]?.xpMult ?? 1)
+          : 1;
+      const xpGain = Math.floor(
+        (XP_PER_GAME + (delta > 0 ? XP_PER_WIN : 0)) * xpMult,
+      );
       let levelReward = 0;
       setXp((prev) => {
         const newXp = prev + xpGain;
@@ -271,8 +314,6 @@ export default function App() {
         }
         return newXp;
       });
-
-      // 6. Weekly challenge
       setWeeklyProgress((prev) => {
         if (weeklyClaimed) return prev;
         const ch = weeklyChallenge;
@@ -286,8 +327,6 @@ export default function App() {
         if (ch.type === "crash3x" && eventType === "cashout") inc = 1;
         return Math.min(prev + inc, ch.target);
       });
-
-      // 7. Session tracking
       sessionRef.current.played++;
       if (delta > 0) {
         sessionRef.current.wins++;
@@ -296,13 +335,9 @@ export default function App() {
           delta,
         );
       }
-
-      // 8. Feedback
       haptic(delta > 0 ? "win" : "lose");
       showToast(delta > 0 ? `+${delta} coins` : `${delta} coins`, delta > 0);
       if (delta >= BIG_WIN_THRESHOLD) setBigWin(delta);
-
-      // 9. Achievements
       if (newStats) {
         const event = {
           type: eventType ?? (delta > 0 ? "win" : "lose"),
@@ -321,13 +356,13 @@ export default function App() {
           return [...cur, ...newOnes];
         });
       }
-
-      // 10. Level reward
-      if (levelReward > 0) {
-        setCoins((c) => c + levelReward);
-      }
-
-      // 11. Session over — hanya jika nextCoins benar-benar 0
+      if (levelReward > 0) setCoins((c) => c + levelReward);
+      updateMissions(eventType, delta, activeGame);
+      // Auto-bet stop loss / take profit check
+      if (autoBetSettings.stopLoss && nextCoins <= autoBetSettings.stopLoss)
+        showToast("Stop Loss hit!", false);
+      if (autoBetSettings.takeProfit && nextCoins >= autoBetSettings.takeProfit)
+        showToast("Take Profit hit!", true);
       if (nextCoins === 0) {
         setTimeout(() => {
           setShowSession({
@@ -339,9 +374,16 @@ export default function App() {
           });
         }, 900);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [activeGame, showToast, weeklyChallenge, weeklyClaimed],
+    [
+      activeGame,
+      showToast,
+      weeklyChallenge,
+      weeklyClaimed,
+      prestige,
+      updateMissions,
+      autoBetSettings,
+    ],
   );
 
   const claimDaily = () => {
@@ -373,6 +415,65 @@ export default function App() {
       });
   };
 
+  const claimMission = (idx) => {
+    const m = dailyMissions[idx];
+    if (!m || m.claimed || m.progress < m.target) return;
+    SFX.bonus();
+    setCoins((c) => c + m.reward);
+    showToast(`+${m.reward} mission reward!`, true);
+    const updated = dailyMissions.map((ms, i) =>
+      i === idx ? { ...ms, claimed: true } : ms,
+    );
+    setDailyMissions(updated);
+    const d = getDailyMissions();
+    saveDailyMissions({ ...d, missions: updated });
+    missionCompletedRef.current++;
+    setAchievements((cur) => {
+      const n = checkAchievements(cur, {
+        type: "mission_complete",
+        data: { total: missionCompletedRef.current },
+        stats,
+        coins,
+      });
+      if (n.length) {
+        n.forEach((id) => {
+          const a = ACHIEVEMENTS.find((x) => x.id === id);
+          if (a) achieveQueue.current.push(a);
+        });
+        return [...cur, ...n];
+      }
+      return cur;
+    });
+  };
+
+  const doPrestige = () => {
+    const newLevel = prestige.level + 1;
+    const newPrestige = {
+      level: newLevel,
+      totalPrestiges: prestige.totalPrestiges + 1,
+    };
+    savePrestige(newPrestige);
+    setPrestige(newPrestige);
+    const bonus = PRESTIGE_BONUSES[newLevel - 1];
+    setCoins(bonus?.startCoins ?? STARTING_COINS);
+    setXp(0);
+    setHistory([]);
+    setShowPrestige(false);
+    SFX.levelup();
+    showToast(`Prestige ${newLevel}! ${bonus?.label}`, true);
+    setAchievements((cur) => {
+      const n = checkAchievements(cur, { type: "prestige", stats, coins });
+      if (n.length) {
+        n.forEach((id) => {
+          const a = ACHIEVEMENTS.find((x) => x.id === id);
+          if (a) achieveQueue.current.push(a);
+        });
+        return [...cur, ...n];
+      }
+      return cur;
+    });
+  };
+
   const resetCoins = () => {
     setLeaderboard((lb) =>
       [...lb, { coins: highScore, date: Date.now() }]
@@ -380,16 +481,25 @@ export default function App() {
         .slice(0, 5),
     );
     sessionRef.current = {
-      startCoins: STARTING_COINS,
+      startCoins: startCoins,
       played: 0,
       wins: 0,
       bestWin: 0,
     };
-    setCoins(STARTING_COINS);
-    setHighScore((h) => Math.max(h, STARTING_COINS));
+    setCoins(startCoins);
+    setHighScore((h) => Math.max(h, startCoins));
     setHistory([]);
     setShowSession(null);
-    showToast("Reloaded 500 coins", true);
+    showToast(`Reloaded ${startCoins} coins`, true);
+  };
+
+  const shareScore = () => {
+    const { level } = calcLevel(xp);
+    const text = `Casino Mini — Level ${level} · Best: ${highScore.toLocaleString()} coins · ${stats.wins}W/${stats.losses}L`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      showToast("Score copied!", true);
+    }
   };
 
   const switchGame = (id) => {
@@ -404,8 +514,6 @@ export default function App() {
     setMutedState(n);
   };
 
-  // swipe gesture — defined after switchGame so it can reference it
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useSwipe(
     gamePanelRef,
     useCallback(
@@ -417,14 +525,20 @@ export default function App() {
             : GAMES[(idx - 1 + GAMES.length) % GAMES.length];
         SFX.swipe();
         switchGame(next.id);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
       },
       [activeGame],
     ),
   );
 
+  const { level } = calcLevel(xp);
+  const pendingMissions = dailyMissions.filter(
+    (m) => m.progress >= m.target && !m.claimed,
+  ).length;
+
   return (
-    <div className="casino-bg relative overflow-x-hidden">
+    <div
+      className={`casino-bg relative overflow-x-hidden ${theme === "light" ? "theme-light" : ""}`}
+    >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-yellow-600/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-yellow-800/5 blur-3xl" />
@@ -443,8 +557,7 @@ export default function App() {
           stats={stats}
           achievements={achievements}
           leaderboard={
-            // Tambahkan sesi aktif saat ini ke leaderboard jika highScore > 0
-            highScore > STARTING_COINS
+            highScore > startCoins
               ? [
                   ...leaderboard,
                   { coins: highScore, date: Date.now(), current: true },
@@ -493,6 +606,29 @@ export default function App() {
           }}
         />
       )}
+      {showMissions && (
+        <DailyMissionsModal
+          missions={dailyMissions}
+          onClaim={claimMission}
+          onClose={() => setShowMissions(false)}
+        />
+      )}
+      {showPrestige && (
+        <PrestigeModal
+          level={level}
+          prestige={prestige}
+          onPrestige={doPrestige}
+          onClose={() => setShowPrestige(false)}
+        />
+      )}
+      {showAutoBet && (
+        <AutoBetModal
+          settings={autoBetSettings}
+          onChange={setAutoBetSettings}
+          onClose={() => setShowAutoBet(false)}
+        />
+      )}
+
       {levelUpMsg && (
         <div className="fixed top-16 left-1/2 -translate-x-1/2 z-[80] fadeup pointer-events-none">
           <div className="rounded-full border border-yellow-400 bg-black/90 px-5 py-2 text-sm font-bold text-yellow-400 shadow-[0_0_20px_#f59e0b66]">
@@ -500,7 +636,6 @@ export default function App() {
           </div>
         </div>
       )}
-
       {toast && (
         <div
           className={`toast fadeup fixed left-1/2 top-4 z-50 -translate-x-1/2 ${toast.win ? "toast-win" : "toast-lose"}`}
@@ -538,95 +673,164 @@ export default function App() {
           </div>
         </div>
 
-        <div className="balance-bar mb-4 flex items-center gap-3 px-4 py-3 sm:px-5 sm:py-4">
-          <div className="flex-1">
+        {/* ── Balance Bar ── */}
+        <div className="balance-bar mb-3 flex items-center gap-3 px-4 py-3 sm:px-5 sm:py-4">
+          <div className="flex-1 min-w-0">
             <p
+              className="text-yellow-800 uppercase"
               style={{
                 fontSize: "clamp(8px,2vw,10px)",
                 letterSpacing: "0.25em",
               }}
-              className="text-yellow-800 uppercase"
             >
               Balance
             </p>
             <p
-              className="mt-0.5 font-bold text-yellow-400"
+              className="mt-0.5 font-bold text-yellow-400 truncate"
               style={{
                 fontSize: "clamp(1.2rem,5vw,1.6rem)",
                 textShadow: "0 0 12px #f59e0b44",
               }}
             >
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-5 h-5 inline-block">{Ic.coin}</span>
+                <span className="w-5 h-5 inline-block flex-shrink-0">
+                  {Ic.coin}
+                </span>
                 {coins.toLocaleString()}
               </span>
             </p>
           </div>
-          <div className="h-8 w-px bg-gradient-to-b from-transparent via-yellow-900 to-transparent" />
-          <div className="text-right flex-1">
+          <div className="h-8 w-px bg-gradient-to-b from-transparent via-yellow-900 to-transparent flex-shrink-0" />
+          <div className="text-right flex-1 min-w-0">
             <p
+              className="text-yellow-800 uppercase"
               style={{
                 fontSize: "clamp(8px,2vw,10px)",
                 letterSpacing: "0.25em",
               }}
-              className="text-yellow-800 uppercase"
             >
               Best
             </p>
             <p
-              className="mt-0.5 font-bold text-yellow-700"
+              className="mt-0.5 font-bold text-yellow-700 truncate"
               style={{ fontSize: "clamp(1rem,4vw,1.2rem)" }}
             >
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-4 h-4 inline-block">{Ic.best}</span>
+                <span className="w-4 h-4 inline-block flex-shrink-0">
+                  {Ic.best}
+                </span>
                 {highScore.toLocaleString()}
               </span>
             </p>
           </div>
-          <div className="flex flex-col gap-1">
+        </div>
+
+        {/* ── Action Toolbar ── */}
+        <div className="toolbar-bar mb-3 flex items-center justify-between gap-1 px-2 py-2">
+          {/* Left group: main nav */}
+          <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => setShowStats(true)}
-              className="btn-outline px-2 py-1"
+              className="toolbar-btn"
               title="Stats (S)"
             >
-              <span className="w-4 h-4 block">{Ic.stats}</span>
+              <span className="w-4 h-4">{Ic.stats}</span>
+              <span>Stats</span>
             </button>
             <button
               type="button"
               onClick={() => setShowWeekly((v) => !v)}
-              className="btn-outline px-2 py-1"
+              className={`toolbar-btn ${showWeekly ? "toolbar-btn-active" : ""}`}
               title="Weekly (W)"
             >
-              <span className="w-4 h-4 block">{Ic.trophy}</span>
+              <span className="w-4 h-4">{Ic.trophy}</span>
+              <span>Weekly</span>
             </button>
             <button
               type="button"
-              onClick={() => setTutStep(0)}
-              className="btn-outline px-2 py-1"
-              title="Tutorial"
+              onClick={() => setShowMissions(true)}
+              className={`toolbar-btn relative ${pendingMissions > 0 ? "toolbar-btn-notify" : ""}`}
+              title="Missions (D)"
             >
-              <span className="w-4 h-4 block">{Ic.warn}</span>
+              <span className="w-4 h-4">{Ic.mission}</span>
+              <span>Missions</span>
+              {pendingMissions > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-400 text-black text-[8px] font-bold flex items-center justify-center border border-black/20">
+                  {pendingMissions}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="h-6 w-px bg-yellow-900/40 flex-shrink-0" />
+
+          {/* Right group: settings */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setShowAutoBet(true)}
+              className="toolbar-btn"
+              title="Auto-Bet"
+            >
+              <span className="w-4 h-4">{Ic.autobet}</span>
+              <span>Auto</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowPrestige(true)}
+              className="toolbar-btn"
+              title="Prestige"
+            >
+              <span className="w-4 h-4">{Ic.prestige}</span>
+              <span>Prestige</span>
+            </button>
+            <button
+              type="button"
+              onClick={shareScore}
+              className="toolbar-btn"
+              title="Share"
+            >
+              <span className="w-4 h-4">{Ic.share}</span>
+              <span>Share</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+              className="toolbar-btn"
+              title="Theme"
+            >
+              <span className="w-4 h-4">
+                {theme === "dark" ? Ic.sun : Ic.moon}
+              </span>
+              <span>{theme === "dark" ? "Light" : "Dark"}</span>
             </button>
             <button
               type="button"
               onClick={toggleMute}
-              className="btn-outline px-2 py-1"
+              className="toolbar-btn"
               title="Mute (M)"
             >
-              <span className="w-4 h-4 block">
-                {muted ? Ic.muted : Ic.mute}
-              </span>
+              <span className="w-4 h-4">{muted ? Ic.muted : Ic.mute}</span>
+              <span>{muted ? "Unmute" : "Mute"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTutStep(0)}
+              className="toolbar-btn"
+              title="Tutorial"
+            >
+              <span className="w-4 h-4">{Ic.info}</span>
+              <span>Help</span>
             </button>
           </div>
         </div>
 
-        {/* XP bar */}
         <div className="mb-3 px-1">
-          <XPBar xp={xp} />
+          <XPBar xp={xp} prestige={prestige} />
         </div>
 
-        {/* Weekly challenge */}
         {showWeekly && (
           <div className="mb-3">
             <WeeklyWidget
@@ -662,7 +866,7 @@ export default function App() {
                   title={a.label}
                   className="shrink-0 w-7 h-7 rounded-full border border-yellow-900/60 bg-yellow-950/40 p-1 text-yellow-500 cursor-default"
                 >
-                  {ACH_ICONS[id] ?? Ic.win}
+                  {Ic.medal}
                 </span>
               ) : null;
             })}
@@ -694,7 +898,11 @@ export default function App() {
           <div className="mb-4 h-px bg-gradient-to-r from-transparent via-yellow-900/60 to-transparent" />
           <ErrorBoundary>
             {activeGame === "slot" && (
-              <SlotMachine coins={coins} onResult={handleResult} />
+              <SlotMachine
+                coins={coins}
+                onResult={handleResult}
+                turbo={autoBetSettings.turbo}
+              />
             )}
             {activeGame === "coin" && (
               <CoinFlip coins={coins} onResult={handleResult} />
@@ -729,9 +937,20 @@ export default function App() {
             {activeGame === "scratch" && (
               <ScratchCard coins={coins} onResult={handleResult} />
             )}
+            {activeGame === "poker" && (
+              <TexasPoker coins={coins} onResult={handleResult} />
+            )}
+            {activeGame === "wheel" && (
+              <WheelOfFortune coins={coins} onResult={handleResult} />
+            )}
+            {activeGame === "dragon" && (
+              <DragonTiger coins={coins} onResult={handleResult} />
+            )}
+            {activeGame === "videopoker" && (
+              <VideoPoker coins={coins} onResult={handleResult} />
+            )}
           </ErrorBoundary>
           <div className="mt-4 h-px bg-gradient-to-r from-transparent via-yellow-900/40 to-transparent" />
-          {/* swipe hint */}
           <p className="mt-2 text-center text-[9px] text-yellow-900 opacity-60">
             ← swipe to switch game →
           </p>
@@ -777,7 +996,8 @@ export default function App() {
             className="btn-outline mt-4 w-full py-2 text-sm"
           >
             <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4">{Ic.reload}</span>Reload 500 coins
+              <span className="w-4 h-4">{Ic.reload}</span>Reload {startCoins}{" "}
+              coins
             </span>
           </button>
         )}
@@ -788,6 +1008,7 @@ export default function App() {
             ["M", "Mute"],
             ["S", "Stats"],
             ["W", "Weekly"],
+            ["D", "Missions"],
             ["1-9", "Switch"],
           ].map(([k, v]) => (
             <span

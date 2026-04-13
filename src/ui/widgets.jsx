@@ -1,15 +1,16 @@
 ﻿import { Ic } from "../icons.jsx";
-import { calcLevel, getVipTier } from "../constants.js";
+import { calcLevel, getVipTier, PRESTIGE_BONUSES } from "../constants.js";
 
-export function XPBar({ xp }) {
+export function XPBar({ xp, prestige }) {
   const { level, xpInLevel, xpNeeded } = calcLevel(xp);
   const pct = Math.min(100, (xpInLevel / xpNeeded) * 100);
   const vip = getVipTier(level);
+  const prestigeInfo =
+    prestige?.level > 0 ? PRESTIGE_BONUSES[prestige.level - 1] : null;
   return (
     <div className="flex items-center gap-2">
-      {/* level badge with VIP color */}
       <div
-        className="flex h-7 w-7 items-center justify-center rounded-full border-2 text-[10px] font-bold flex-shrink-0 transition-all duration-500"
+        className="flex h-7 w-7 items-center justify-center rounded-full border-2 text-[10px] font-bold flex-shrink-0 transition-all duration-500 relative"
         style={{
           borderColor: vip.color,
           color: vip.color,
@@ -18,16 +19,27 @@ export function XPBar({ xp }) {
         }}
       >
         {level}
+        {prestigeInfo && (
+          <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-yellow-500 text-black text-[7px] font-bold flex items-center justify-center border border-black">
+            {prestige.level}
+          </span>
+        )}
       </div>
       <div className="flex-1">
-        {/* VIP tier name */}
         <div className="flex items-center justify-between mb-0.5">
-          <span
-            className="text-[9px] font-bold tracking-wider"
-            style={{ color: vip.color }}
-          >
-            {vip.name}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span
+              className="text-[9px] font-bold tracking-wider"
+              style={{ color: vip.color }}
+            >
+              {vip.name}
+            </span>
+            {prestigeInfo && (
+              <span className="text-[8px] text-yellow-600 border border-yellow-800/40 rounded px-1">
+                {prestigeInfo.label}
+              </span>
+            )}
+          </div>
           <span className="text-[9px] text-yellow-800">
             {xpInLevel}/{xpNeeded} XP
           </span>

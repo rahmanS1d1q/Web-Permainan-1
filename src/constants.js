@@ -1,17 +1,22 @@
 // ── Game constants ─────────────────────────────────────────────────────────────
-export const SYMBOLS = ["🍒", "🍋", "🍊", "🍇", "⭐", "💎", "7️⃣"];
-// Slot payouts tuned for ~88% RTP
-// 7 symbols, each 1/7 per reel → 1/343 per combo
-// Expected: (50+30+20+15+10+8+5)/343 × bet = 138/343 ≈ 40% → too low
-// Add near-miss symbols to boost hit rate: use weighted pool
+// Slot symbols & payouts moved to src/slotSymbols.jsx (SVG-based)
+export const SYMBOLS = [
+  "cherry",
+  "lemon",
+  "bell",
+  "grapes",
+  "star",
+  "bar",
+  "diamond",
+];
 export const PAYOUTS = {
-  "💎💎💎": 40,
-  "7️⃣7️⃣7️⃣": 25,
-  "⭐⭐⭐": 15,
-  "🍇🍇🍇": 10,
-  "🍊🍊🍊": 7,
-  "🍋🍋🍋": 5,
-  "🍒🍒🍒": 3,
+  "diamond-diamond-diamond": 40,
+  "bar-bar-bar": 25,
+  "star-star-star": 15,
+  "grapes-grapes-grapes": 10,
+  "bell-bell-bell": 7,
+  "lemon-lemon-lemon": 5,
+  "cherry-cherry-cherry": 3,
 };
 export const STARTING_COINS = 500;
 export const STORAGE_KEY = "casino-mini-state";
@@ -106,7 +111,7 @@ export function loadWeekly() {
 // ── Achievements ───────────────────────────────────────────────────────────────
 export const ACHIEVEMENTS = [
   { id: "first_win", label: "First Blood", desc: "Win your first game" },
-  { id: "jackpot", label: "Jackpot!", desc: "Hit 💎💎💎 on slots" },
+  { id: "jackpot", label: "Jackpot!", desc: "Hit Diamond×3 on slots" },
   {
     id: "lucky7",
     label: "Lucky Seven",
@@ -154,6 +159,22 @@ export const ACHIEVEMENTS = [
     label: "Diamond",
     desc: "Reach Diamond VIP tier (Level 20)",
   },
+  {
+    id: "prestige_1",
+    label: "Prestige I",
+    desc: "Reach max level and prestige",
+  },
+  {
+    id: "mission_master",
+    label: "Mission Master",
+    desc: "Complete 10 daily missions",
+  },
+  { id: "poker_win", label: "Poker Pro", desc: "Win a hand of Texas Hold'em" },
+  {
+    id: "wheel_jackpot",
+    label: "Wheel Jackpot",
+    desc: "Land on the jackpot in Wheel of Fortune",
+  },
 ];
 
 export function checkAchievements(current, event) {
@@ -175,6 +196,11 @@ export function checkAchievements(current, event) {
   if (type === "daily" && data?.streak >= 7) unlocked.push("daily_7");
   if (level >= 10) unlocked.push("vip_gold");
   if (level >= 20) unlocked.push("vip_diamond");
+  if (type === "prestige") unlocked.push("prestige_1");
+  if (type === "mission_complete" && data?.total >= 10)
+    unlocked.push("mission_master");
+  if (type === "poker_win") unlocked.push("poker_win");
+  if (type === "wheel_jackpot") unlocked.push("wheel_jackpot");
   return unlocked.filter((id) => !current.includes(id));
 }
 
@@ -232,6 +258,163 @@ export const TUTORIAL_STEPS = [
   },
 ];
 
+// ── Daily Missions ─────────────────────────────────────────────────────────────
+export const DAILY_MISSIONS_POOL = [
+  { id: "dm_win3", desc: "Win 3 games", type: "wins", target: 3, reward: 50 },
+  { id: "dm_win5", desc: "Win 5 games", type: "wins", target: 5, reward: 100 },
+  {
+    id: "dm_play10",
+    desc: "Play 10 games",
+    type: "played",
+    target: 10,
+    reward: 80,
+  },
+  {
+    id: "dm_play5",
+    desc: "Play 5 games",
+    type: "played",
+    target: 5,
+    reward: 40,
+  },
+  {
+    id: "dm_earn200",
+    desc: "Earn 200 coins",
+    type: "earned",
+    reward: 120,
+    target: 200,
+  },
+  {
+    id: "dm_earn500",
+    desc: "Earn 500 coins",
+    type: "earned",
+    reward: 250,
+    target: 500,
+  },
+  {
+    id: "dm_streak3",
+    desc: "Win 3 in a row",
+    type: "streak",
+    target: 3,
+    reward: 150,
+  },
+  {
+    id: "dm_bj",
+    desc: "Play Blackjack 3 times",
+    type: "game_bj",
+    target: 3,
+    reward: 80,
+  },
+  {
+    id: "dm_roulette",
+    desc: "Spin Roulette 2 times",
+    type: "game_roulette",
+    target: 2,
+    reward: 60,
+  },
+  {
+    id: "dm_crash",
+    desc: "Cash out Crash 2 times",
+    type: "cashout_crash",
+    target: 2,
+    reward: 100,
+  },
+  {
+    id: "dm_slots",
+    desc: "Spin Slots 5 times",
+    type: "game_slot",
+    target: 5,
+    reward: 60,
+  },
+  {
+    id: "dm_poker",
+    desc: "Play Poker 2 times",
+    type: "game_poker",
+    target: 2,
+    reward: 80,
+  },
+];
+export const DAILY_MISSIONS_KEY = "casino-daily-missions";
+export function getDailyMissions() {
+  const today = new Date().toDateString();
+  try {
+    const s = localStorage.getItem(DAILY_MISSIONS_KEY);
+    if (s) {
+      const d = JSON.parse(s);
+      if (d.date === today) return d;
+    }
+  } catch {}
+  // pick 3 random missions for today
+  const seed = new Date()
+    .toDateString()
+    .split("")
+    .reduce((a, c) => a + c.charCodeAt(0), 0);
+  const shuffled = [...DAILY_MISSIONS_POOL].sort((a, b) => {
+    const ha = Math.sin(seed + a.id.length) * 10000;
+    const hb = Math.sin(seed + b.id.length) * 10000;
+    return ha - Math.floor(ha) - (hb - Math.floor(hb));
+  });
+  const missions = shuffled
+    .slice(0, 3)
+    .map((m) => ({ ...m, progress: 0, claimed: false }));
+  const data = { date: today, missions };
+  localStorage.setItem(DAILY_MISSIONS_KEY, JSON.stringify(data));
+  return data;
+}
+export function saveDailyMissions(data) {
+  localStorage.setItem(DAILY_MISSIONS_KEY, JSON.stringify(data));
+}
+
+// ── Prestige System ────────────────────────────────────────────────────────────
+export const PRESTIGE_KEY = "casino-prestige";
+export const PRESTIGE_BONUSES = [
+  {
+    level: 1,
+    label: "Prestige I",
+    bonus: "+5% XP",
+    xpMult: 1.05,
+    startCoins: 600,
+  },
+  {
+    level: 2,
+    label: "Prestige II",
+    bonus: "+10% XP, +100 start",
+    xpMult: 1.1,
+    startCoins: 700,
+  },
+  {
+    level: 3,
+    label: "Prestige III",
+    bonus: "+15% XP, +200 start",
+    xpMult: 1.15,
+    startCoins: 800,
+  },
+  {
+    level: 4,
+    label: "Prestige IV",
+    bonus: "+20% XP, +300 start",
+    xpMult: 1.2,
+    startCoins: 900,
+  },
+  {
+    level: 5,
+    label: "Prestige V",
+    bonus: "+25% XP, +500 start",
+    xpMult: 1.25,
+    startCoins: 1000,
+  },
+];
+export function getPrestige() {
+  try {
+    const s = localStorage.getItem(PRESTIGE_KEY);
+    return s ? JSON.parse(s) : { level: 0, totalPrestiges: 0 };
+  } catch {
+    return { level: 0, totalPrestiges: 0 };
+  }
+}
+export function savePrestige(data) {
+  localStorage.setItem(PRESTIGE_KEY, JSON.stringify(data));
+}
+
 // ── Haptic ─────────────────────────────────────────────────────────────────────
 export function haptic(type = "light") {
   if (!navigator.vibrate) return;
@@ -269,4 +452,8 @@ export const GAMES = [
   { id: "baccarat", label: "Baccarat" },
   { id: "keno", label: "Keno" },
   { id: "scratch", label: "Scratch" },
+  { id: "poker", label: "Poker" },
+  { id: "wheel", label: "Wheel" },
+  { id: "dragon", label: "Dragon" },
+  { id: "videopoker", label: "Video Poker" },
 ];

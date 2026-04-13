@@ -6,6 +6,7 @@ import {
   MAX_LEVEL,
   DAILY_STREAK_BONUSES,
   GAMES,
+  PRESTIGE_BONUSES,
 } from "../constants.js";
 import { SFX } from "../sounds.js";
 
@@ -530,6 +531,271 @@ export function BetSelector({
             {b}
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Daily Missions Modal ───────────────────────────────────────────────────────
+export function DailyMissionsModal({ missions, onClaim, onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="card-glass m-4 w-full max-w-sm rounded-2xl p-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-5 h-5 text-yellow-400">{Ic.mission}</span>
+            <p className="text-sm font-bold text-yellow-400 tracking-widest">
+              DAILY MISSIONS
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-6 h-6 text-yellow-700 hover:text-yellow-400"
+          >
+            <span className="w-4 h-4 block">{Ic.close}</span>
+          </button>
+        </div>
+        <div className="space-y-3">
+          {missions.map((m, i) => {
+            const pct = Math.min(100, (m.progress / m.target) * 100);
+            const done = m.progress >= m.target;
+            return (
+              <div
+                key={i}
+                className={`rounded-xl border p-3 transition ${done && !m.claimed ? "border-yellow-600/60 bg-yellow-950/30" : m.claimed ? "border-[#1a1200] bg-[#0a0800] opacity-60" : "border-[#2a1e00] bg-[#0f0c00]"}`}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <p
+                    className={`text-xs font-bold ${m.claimed ? "text-yellow-900" : "text-yellow-400"}`}
+                  >
+                    {m.desc}
+                  </p>
+                  <span className="text-[10px] text-yellow-600 font-bold">
+                    +{m.reward}
+                  </span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-[#1a1200] mb-1.5">
+                  <div
+                    className={`h-1.5 rounded-full transition-all ${done ? "bg-yellow-400" : "bg-yellow-700"}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-yellow-800">
+                    {Math.min(m.progress, m.target)}/{m.target}
+                  </span>
+                  {done && !m.claimed && (
+                    <button
+                      type="button"
+                      onClick={() => onClaim(i)}
+                      className="btn-gold px-3 py-0.5 text-[10px] rounded-lg"
+                      style={{ minHeight: 28 }}
+                    >
+                      <span className="flex items-center gap-1">
+                        <span className="w-3 h-3">{Ic.gift}</span>Claim
+                      </span>
+                    </button>
+                  )}
+                  {m.claimed && (
+                    <span className="text-[10px] text-yellow-700 flex items-center gap-1">
+                      <span className="w-3 h-3">{Ic.check}</span>Done
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-center text-[10px] text-yellow-900">
+          Missions reset daily at midnight
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Prestige Modal ─────────────────────────────────────────────────────────────
+export function PrestigeModal({ level, prestige, onPrestige, onClose }) {
+  const canPrestige = level >= MAX_LEVEL;
+  const nextPrestige =
+    PRESTIGE_BONUSES[Math.min(prestige.level, PRESTIGE_BONUSES.length - 1)];
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="card-glass m-4 w-full max-w-xs rounded-2xl p-6 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-3 w-14 h-14 mx-auto text-yellow-400">
+          {Ic.prestige}
+        </div>
+        <h2 className="text-lg font-bold text-yellow-400 tracking-widest">
+          PRESTIGE
+        </h2>
+        <p className="mt-2 text-sm text-yellow-700">
+          Reset to Level 1 and earn permanent bonuses
+        </p>
+        {prestige.level > 0 && (
+          <div className="mt-3 rounded-xl border border-yellow-800/40 bg-yellow-950/20 p-2">
+            <p className="text-[10px] text-yellow-700">
+              Current:{" "}
+              <span className="text-yellow-400 font-bold">
+                {PRESTIGE_BONUSES[prestige.level - 1]?.label}
+              </span>
+            </p>
+            <p className="text-[10px] text-yellow-800">
+              {PRESTIGE_BONUSES[prestige.level - 1]?.bonus}
+            </p>
+          </div>
+        )}
+        {nextPrestige && (
+          <div className="mt-3 rounded-xl border border-yellow-600/40 bg-yellow-950/30 p-3">
+            <p className="text-xs text-yellow-600 font-bold">
+              {nextPrestige.label}
+            </p>
+            <p className="text-[10px] text-yellow-700 mt-0.5">
+              {nextPrestige.bonus}
+            </p>
+            <p className="text-[10px] text-yellow-800 mt-0.5">
+              Start with {nextPrestige.startCoins} coins
+            </p>
+          </div>
+        )}
+        {!canPrestige && (
+          <p className="mt-3 text-[10px] text-yellow-800">
+            Reach Level {MAX_LEVEL} to prestige
+          </p>
+        )}
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-outline flex-1 py-2 text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onPrestige}
+            disabled={!canPrestige}
+            className="btn-gold flex-1 py-2 text-sm"
+          >
+            <span className="flex items-center justify-center gap-1.5">
+              <span className="w-4 h-4">{Ic.prestige}</span>Prestige!
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Auto-Bet Settings Modal ────────────────────────────────────────────────────
+export function AutoBetModal({ settings, onChange, onClose }) {
+  const [stopLoss, setStopLoss] = useState(settings.stopLoss ?? "");
+  const [takeProfit, setTakeProfit] = useState(settings.takeProfit ?? "");
+  const [turbo, setTurbo] = useState(settings.turbo ?? false);
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="card-glass m-4 w-full max-w-xs rounded-2xl p-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-5 h-5 text-yellow-400">{Ic.settings}</span>
+            <p className="text-sm font-bold text-yellow-400 tracking-widest">
+              AUTO-BET
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-6 h-6 text-yellow-700 hover:text-yellow-400"
+          >
+            <span className="w-4 h-4 block">{Ic.close}</span>
+          </button>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[10px] text-yellow-800 tracking-widest flex items-center gap-1.5 mb-1">
+              <span className="w-3.5 h-3.5">{Ic.stopLoss}</span>STOP LOSS
+              (coins)
+            </label>
+            <input
+              type="number"
+              value={stopLoss}
+              onChange={(e) => setStopLoss(e.target.value)}
+              placeholder="e.g. 100"
+              className="w-full rounded-lg border border-[#3d2e00] bg-[#0f0c00] px-3 py-2 text-sm text-yellow-400 outline-none focus:border-yellow-700"
+            />
+            <p className="text-[9px] text-yellow-900 mt-0.5">
+              Stop when balance drops below this
+            </p>
+          </div>
+          <div>
+            <label className="text-[10px] text-yellow-800 tracking-widest flex items-center gap-1.5 mb-1">
+              <span className="w-3.5 h-3.5">{Ic.takeProfit}</span>TAKE PROFIT
+              (coins)
+            </label>
+            <input
+              type="number"
+              value={takeProfit}
+              onChange={(e) => setTakeProfit(e.target.value)}
+              placeholder="e.g. 1000"
+              className="w-full rounded-lg border border-[#3d2e00] bg-[#0f0c00] px-3 py-2 text-sm text-yellow-400 outline-none focus:border-yellow-700"
+            />
+            <p className="text-[9px] text-yellow-900 mt-0.5">
+              Stop when balance reaches this
+            </p>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-[#2a1e00] bg-[#0f0c00] px-3 py-2">
+            <div className="flex items-center gap-2">
+              <span className="w-4 h-4 text-yellow-600">{Ic.turbo}</span>
+              <div>
+                <p className="text-xs font-bold text-yellow-400">Turbo Mode</p>
+                <p className="text-[9px] text-yellow-800">Skip animations</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTurbo((t) => !t)}
+              className={`w-10 h-5 rounded-full transition-all relative ${turbo ? "bg-yellow-500" : "bg-[#2a1e00]"}`}
+            >
+              <div
+                className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${turbo ? "left-5" : "left-0.5"}`}
+              />
+            </button>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            onChange({
+              stopLoss: stopLoss ? parseInt(stopLoss) : null,
+              takeProfit: takeProfit ? parseInt(takeProfit) : null,
+              turbo,
+            });
+            onClose();
+          }}
+          className="btn-gold mt-4 w-full py-2 text-sm"
+        >
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4">{Ic.check}</span>Apply
+          </span>
+        </button>
       </div>
     </div>
   );

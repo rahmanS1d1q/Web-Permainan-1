@@ -1,7 +1,5 @@
-﻿// ── SVG Icon Library ──────────────────────────────────────────────────────────
-// Reusable inline SVG icons — no emoji, no external deps
+// ── SVG Icon Library ──────────────────────────────────────────────────────────
 export const Ic = {
-  // UI actions
   spin: (
     <svg
       viewBox="0 0 20 20"
@@ -21,8 +19,9 @@ export const Ic = {
       stroke="currentColor"
       strokeWidth="1.8"
       strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path d="M10 3v14M5 6l5-3 5 3M5 14l5 3 5-3" />
+      <path d="M2 10h16M10 3l4 4-4 4M10 17l-4-4 4-4" />
     </svg>
   ),
   roll: (
@@ -121,19 +120,13 @@ export const Ic = {
       strokeLinecap="round"
     >
       <circle cx="10" cy="10" r="7" />
-      <path d="M10 7v1.2M10 11.8V13" />
+      <path d="M10 7v.8M10 11.8V13" />
       <path d="M8.2 9c0-.9.8-1.6 1.8-1.6s1.8.7 1.8 1.6c0 .7-.5 1.2-1.8 1.4-1.3.2-1.8.7-1.8 1.4 0 .9.8 1.6 1.8 1.6s1.8-.7 1.8-1.6" />
     </svg>
   ),
   start: (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    >
-      <polygon points="5,3 17,10 5,17" fill="currentColor" stroke="none" />
+    <svg viewBox="0 0 20 20" fill="none">
+      <polygon points="5,3 17,10 5,17" fill="currentColor" />
     </svg>
   ),
   replay: (
@@ -248,7 +241,6 @@ export const Ic = {
       <path d="M13 7V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" />
     </svg>
   ),
-  // UI state
   mute: (
     <svg
       viewBox="0 0 20 20"
@@ -311,7 +303,6 @@ export const Ic = {
     >
       <circle cx="10" cy="13" r="5" />
       <path d="M7 3 L10 8 L13 3" />
-      <path d="M10 10.5 L10 11.5M9 12.5 L11 12.5" />
     </svg>
   ),
   close: (
@@ -378,7 +369,6 @@ export const Ic = {
       <path d="M10 2l2.4 4.8 5.3.8-3.8 3.7.9 5.2L10 14l-4.8 2.5.9-5.2L2.3 7.6l5.3-.8z" />
     </svg>
   ),
-  // result states
   win: (
     <svg
       viewBox="0 0 20 20"
@@ -425,7 +415,6 @@ export const Ic = {
       <path d="M5 16 L15 16" />
     </svg>
   ),
-  // roulette color dots
   redDot: (
     <svg viewBox="0 0 12 12">
       <circle cx="6" cy="6" r="5" fill="#dc2626" />
@@ -441,7 +430,6 @@ export const Ic = {
       <circle cx="6" cy="6" r="5" fill="#16a34a" />
     </svg>
   ),
-  // card back
   cardBack: (
     <svg
       viewBox="0 0 40 56"
@@ -469,7 +457,6 @@ export const Ic = {
       />
     </svg>
   ),
-  // streak / fire
   fire: (
     <svg
       viewBox="0 0 20 20"
@@ -485,7 +472,6 @@ export const Ic = {
       />
     </svg>
   ),
-  // leaderboard positions
   gold: (
     <svg viewBox="0 0 20 20">
       <circle cx="10" cy="10" r="8" fill="#f59e0b" opacity="0.9" />
@@ -531,9 +517,227 @@ export const Ic = {
       </text>
     </svg>
   ),
+  sun: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="10" r="3.5" />
+      <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.9 4.9l1.4 1.4M13.7 13.7l1.4 1.4M4.9 15.1l1.4-1.4M13.7 6.3l1.4-1.4" />
+    </svg>
+  ),
+  moon: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path
+        d="M15 10.5a6.5 6.5 0 1 1-6-6.5 5 5 0 0 0 6 6.5z"
+        fill="currentColor"
+        fillOpacity="0.15"
+      />
+    </svg>
+  ),
+  mission: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="3" y="4" width="14" height="13" rx="2" />
+      <path d="M3 8h14" />
+      <path d="M7 2v3M13 2v3" />
+      <path d="M6 12l2 2 4-4" />
+    </svg>
+  ),
+  autobet: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="10" r="7" />
+      <path d="M10 6v4l3 2" />
+      <path d="M14 3l2 2-2 2" />
+    </svg>
+  ),
+  turbo: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 10h5l2-6 2 12 2-6h3" />
+    </svg>
+  ),
+  prestige: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path
+        d="M10 2l2.4 4.8 5.3.8-3.8 3.7.9 5.2L10 14l-4.8 2.5.9-5.2L2.3 7.6l5.3-.8z"
+        fill="currentColor"
+        fillOpacity="0.2"
+      />
+      <circle cx="10" cy="10" r="2.5" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  share: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="15" cy="4" r="2" />
+      <circle cx="5" cy="10" r="2" />
+      <circle cx="15" cy="16" r="2" />
+      <path d="M7 9l6-4M7 11l6 4" />
+    </svg>
+  ),
+  stopLoss: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="3" y="3" width="14" height="14" rx="2" />
+      <path d="M7 7l6 6M13 7l-6 6" />
+    </svg>
+  ),
+  takeProfit: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 14l4-4 3 3 4-5 3 3" />
+      <path d="M14 7h3v3" />
+    </svg>
+  ),
+  check: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 10 L8 14 L16 6" />
+    </svg>
+  ),
+  lock: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="5" y="9" width="10" height="8" rx="1.5" />
+      <path d="M8 9V7a2 2 0 0 1 4 0v2" />
+    </svg>
+  ),
+  chart: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 15l4-5 3 3 4-6 3 4" />
+      <path d="M3 17h14" />
+    </svg>
+  ),
+  settings: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="10" r="2.5" />
+      <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.9 4.9l1.4 1.4M13.7 13.7l1.4 1.4M4.9 15.1l1.4-1.4M13.7 6.3l1.4-1.4" />
+    </svg>
+  ),
+  info: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="10" r="7.5" />
+      <path d="M10 9v5M10 7v.5" />
+    </svg>
+  ),
+  fold: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M5 15L15 5M5 5l10 10" />
+    </svg>
+  ),
+  call: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 10h12M10 5l5 5-5 5" />
+    </svg>
+  ),
+  raise: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 15V5M5 10l5-5 5 5" />
+      <path d="M4 16h12" />
+    </svg>
+  ),
 };
 
-// ── Achievement icons (SVG per achievement id) ────────────────────────────────
+// ── Achievement icons ─────────────────────────────────────────────────────────
 export const ACH_ICONS = {
   first_win: (
     <svg
@@ -781,31 +985,65 @@ export const ACH_ICONS = {
       <path d="M2 8h16M6 8l4-6M14 8l-4-6" />
     </svg>
   ),
+  prestige_1: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path
+        d="M10 2l2.4 4.8 5.3.8-3.8 3.7.9 5.2L10 14l-4.8 2.5.9-5.2L2.3 7.6l5.3-.8z"
+        fill="currentColor"
+        fillOpacity="0.2"
+      />
+      <circle cx="10" cy="10" r="2.5" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  mission_master: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="3" y="4" width="14" height="13" rx="2" />
+      <path d="M3 8h14" />
+      <path d="M7 2v3M13 2v3" />
+      <path d="M6 12l2 2 4-4" />
+    </svg>
+  ),
+  poker_win: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <rect x="2" y="3" width="7" height="10" rx="1.5" />
+      <rect x="11" y="7" width="7" height="10" rx="1.5" />
+      <path d="M5 6h1M5 8h2M14 10h1M14 12h2" />
+    </svg>
+  ),
+  wheel_jackpot: (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <circle cx="10" cy="10" r="8" />
+      <circle cx="10" cy="10" r="2.5" />
+      <path d="M10 2v5.5M10 12.5V18M2 10h5.5M12.5 10H18" />
+    </svg>
+  ),
 };
 
-// Helper: icon button with SVG
-function IconBtn({
-  icon,
-  label,
-  onClick,
-  className = "",
-  disabled = false,
-  title = "",
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      className={`flex items-center justify-center gap-1.5 ${className}`}
-    >
-      <span className="w-4 h-4 flex-shrink-0">{icon}</span>
-      {label && <span>{label}</span>}
-    </button>
-  );
-}
-
+// ── Game tab icons ─────────────────────────────────────────────────────────────
 export const GameIcons = {
   slot: (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -933,13 +1171,6 @@ export const GameIcons = {
         strokeWidth="1.4"
         strokeLinecap="round"
       />
-      <path
-        d="M8 5.5 C6 7 4.5 9.3 4.5 12"
-        stroke="currentColor"
-        strokeWidth="0.8"
-        strokeLinecap="round"
-        opacity="0.35"
-      />
     </svg>
   ),
   lucky: (
@@ -952,15 +1183,6 @@ export const GameIcons = {
         rx="4"
         stroke="currentColor"
         strokeWidth="1.5"
-      />
-      <rect
-        x="2.5"
-        y="2.5"
-        width="19"
-        height="19"
-        rx="4"
-        fill="currentColor"
-        fillOpacity="0.06"
       />
       <circle cx="7.5" cy="7.5" r="1.6" fill="currentColor" />
       <circle cx="16.5" cy="7.5" r="1.6" fill="currentColor" />
@@ -1050,33 +1272,6 @@ export const GameIcons = {
         fillOpacity="0.1"
       />
       <circle cx="18" cy="5" r="2" fill="currentColor" />
-      <line
-        x1="18"
-        y1="2.5"
-        x2="18"
-        y2="3.5"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="20.3"
-        y1="3.2"
-        x2="19.5"
-        y2="4"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="21"
-        y1="5"
-        x2="20"
-        y2="5"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-      />
     </svg>
   ),
   bj: (
@@ -1117,13 +1312,6 @@ export const GameIcons = {
         stroke="currentColor"
         strokeWidth="1.2"
         strokeLinecap="round"
-      />
-      <path
-        d="M9 17.5 L9.5 17 L10 17.5"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   ),
@@ -1176,42 +1364,6 @@ export const GameIcons = {
         strokeWidth="1.3"
         strokeLinecap="round"
       />
-      <line
-        x1="5.1"
-        y1="5.1"
-        x2="7.2"
-        y2="7.2"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="16.8"
-        y1="16.8"
-        x2="18.9"
-        y2="18.9"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="18.9"
-        y1="5.1"
-        x2="16.8"
-        y2="7.2"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="7.2"
-        y1="16.8"
-        x2="5.1"
-        y2="18.9"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-      />
       <circle cx="12" cy="4.5" r="1.2" fill="currentColor" />
     </svg>
   ),
@@ -1223,14 +1375,6 @@ export const GameIcons = {
       <circle cx="5.5" cy="12.5" r="1.3" fill="currentColor" />
       <circle cx="12" cy="12.5" r="1.3" fill="currentColor" />
       <circle cx="18.5" cy="12.5" r="1.3" fill="currentColor" />
-      <path
-        d="M12 4.8 L9 6.3 L6.8 11.2"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeLinecap="round"
-        strokeDasharray="1.5 1.2"
-        opacity="0.45"
-      />
       <rect
         x="2"
         y="18.5"
@@ -1271,7 +1415,7 @@ export const GameIcons = {
         strokeLinecap="round"
       />
       <path
-        d="M16 8 L18.5 5.5 L19 5 L18.5 5.5"
+        d="M16 8 L18.5 5.5"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
@@ -1294,40 +1438,6 @@ export const GameIcons = {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-      />
-      <path
-        d="M19.5 19.5 L8 8"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        opacity="0.5"
-      />
-      <path
-        d="M8 8 L5.5 5.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        opacity="0.5"
-      />
-      <path d="M6 4 L4 6 L6 4z" fill="currentColor" opacity="0.5" />
-      <rect
-        x="13.5"
-        y="11.5"
-        width="5"
-        height="2"
-        rx="1"
-        transform="rotate(45 13.5 11.5)"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth="0.5"
-        opacity="0.5"
-      />
-      <path
-        d="M19.5 19.5 L21 21"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        opacity="0.5"
       />
     </svg>
   ),
@@ -1365,12 +1475,6 @@ export const GameIcons = {
         r="2.5"
         stroke="currentColor"
         strokeWidth="1.2"
-      />
-      <path
-        d="M16 13.5h3M17.5 12v3"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeLinecap="round"
       />
     </svg>
   ),
@@ -1467,12 +1571,213 @@ export const GameIcons = {
         stroke="currentColor"
         strokeWidth="1.2"
       />
-      <path
-        d="M3 9 Q5 7 7 9 Q9 11 11 9"
+    </svg>
+  ),
+  poker: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="2"
+        y="3"
+        width="8"
+        height="12"
+        rx="2"
         stroke="currentColor"
-        strokeWidth="1"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="14"
+        y="9"
+        width="8"
+        height="12"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="currentColor"
+        fillOpacity="0.08"
+      />
+      <path
+        d="M5 7h2M5 10h3"
+        stroke="currentColor"
+        strokeWidth="1.2"
         strokeLinecap="round"
-        opacity="0.4"
+      />
+      <path
+        d="M17 13h2M17 16h3"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M10 9l4 0"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeDasharray="1.5 1"
+      />
+    </svg>
+  ),
+  wheel: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.3" />
+      <line
+        x1="12"
+        y1="2.5"
+        x2="12"
+        y2="9"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="12"
+        y1="15"
+        x2="12"
+        y2="21.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="2.5"
+        y1="12"
+        x2="9"
+        y2="12"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="15"
+        y1="12"
+        x2="21.5"
+        y2="12"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="5.1"
+        y1="5.1"
+        x2="9.5"
+        y2="9.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="14.5"
+        y1="14.5"
+        x2="18.9"
+        y2="18.9"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="18.9"
+        y1="5.1"
+        x2="14.5"
+        y2="9.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <line
+        x1="9.5"
+        y1="14.5"
+        x2="5.1"
+        y2="18.9"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="4.5" r="1.2" fill="currentColor" />
+    </svg>
+  ),
+  dragon: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="2"
+        y="5"
+        width="8"
+        height="14"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="14"
+        y="5"
+        width="8"
+        height="14"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="currentColor"
+        fillOpacity="0.08"
+      />
+      <path
+        d="M10 12h4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="6" cy="9" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="9" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  videopoker: (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="2"
+        y="4"
+        width="20"
+        height="16"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path d="M2 9h20" stroke="currentColor" strokeWidth="1.2" opacity="0.5" />
+      <rect
+        x="4"
+        y="12"
+        width="3"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.2"
+      />
+      <rect
+        x="8.5"
+        y="12"
+        width="3"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        fill="currentColor"
+        fillOpacity="0.15"
+      />
+      <rect
+        x="13"
+        y="12"
+        width="3"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.2"
+      />
+      <rect
+        x="17.5"
+        y="12"
+        width="3"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        fill="currentColor"
+        fillOpacity="0.15"
       />
     </svg>
   ),

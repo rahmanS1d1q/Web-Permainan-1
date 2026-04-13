@@ -238,7 +238,7 @@ body {
 
 /* ── Slot window ── */
 .slot-window {
-  height: clamp(72px, 18vw, 96px);
+  height: clamp(80px, 20vw, 104px);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -851,4 +851,177 @@ body {
 }
 .game-tab.active .game-tab-icon svg {
   stroke: #000;
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] body {
+  background: #f5f0e8;
+  color: #78350f;
+}
+[data-theme="light"] .casino-bg {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, #fde68a44 0%, transparent 70%),
+    linear-gradient(180deg, #fef3c7 0%, #f5f0e8 100%);
+}
+[data-theme="light"] .card-glass {
+  background: linear-gradient(145deg, #fffbf0ee 0%, #fef3c7cc 100%);
+  border-color: #d97706aa;
+}
+[data-theme="light"] .card-bg {
+  background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #d97706;
+}
+[data-theme="light"] .balance-bar {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #d97706;
+}
+[data-theme="light"] .btn-outline {
+  border-color: #d97706;
+  color: #92400e;
+  background: linear-gradient(145deg, #fef3c788, #fde68a88);
+}
+[data-theme="light"] .btn-outline:hover:not(:disabled) {
+  border-color: #b45309;
+  color: #78350f;
+  background: linear-gradient(145deg, #fde68a, #fbbf24aa);
+}
+[data-theme="light"] .game-tab {
+  border-color: #d97706;
+  background: linear-gradient(145deg, #fef3c788, #fde68a88);
+  color: #92400e;
+}
+[data-theme="light"] .game-tab:hover {
+  color: #78350f;
+  border-color: #b45309;
+}
+[data-theme="light"] .game-tab.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #000;
+}
+[data-theme="light"] .neon-gold {
+  color: #92400e;
+  text-shadow: 0 0 10px #f59e0b55;
+}
+[data-theme="light"] .toast-win {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  color: #000;
+}
+[data-theme="light"] .toast-lose {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+}
+[data-theme="light"] .result-win {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #d97706;
+  color: #78350f;
+}
+[data-theme="light"] .result-lose {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border-color: #dc2626;
+  color: #7f1d1d;
+}
+[data-theme="light"] .result-push {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #3b82f6;
+  color: #1e3a8a;
+}
+[data-theme="light"] .playing-card {
+  background: linear-gradient(145deg, #fff, #fef3c7);
+  border-color: #d97706;
+}
+[data-theme="light"] .crash-display {
+  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #d97706;
+}
+[data-theme="light"] .crash-grid {
+  background-image:
+    linear-gradient(#d9770615 1px, transparent 1px),
+    linear-gradient(90deg, #d9770615 1px, transparent 1px);
+}
+
+/* ── Mission badge pulse ── */
+@keyframes badge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+.badge-pulse {
+  animation: badge-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Action Toolbar ── */
+.toolbar-bar {
+  background: linear-gradient(135deg, #1a1200, #0f0c00);
+  border: 1px solid #2a1e00;
+  border-radius: 14px;
+  box-shadow:
+    0 2px 12px #00000044,
+    inset 0 1px 0 #ffffff06;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.toolbar-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.toolbar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #78350f;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  min-width: 44px;
+  position: relative;
+  flex-shrink: 0;
+}
+.toolbar-btn:hover {
+  background: #2a1e0066;
+  border-color: #3d2e00;
+  color: #d97706;
+}
+.toolbar-btn:active {
+  transform: scale(0.94);
+}
+
+.toolbar-btn-active {
+  background: #2a1e0088;
+  border-color: #d97706;
+  color: #fbbf24;
+}
+.toolbar-btn-notify {
+  border-color: #f59e0b66;
+  color: #d97706;
+}
+
+[data-theme="light"] .toolbar-bar {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #d97706;
+}
+[data-theme="light"] .toolbar-btn {
+  color: #92400e;
+}
+[data-theme="light"] .toolbar-btn:hover {
+  background: #fbbf2433;
+  border-color: #d97706;
+  color: #78350f;
+}
+[data-theme="light"] .toolbar-btn-active {
+  background: #fbbf2444;
+  border-color: #d97706;
+  color: #78350f;
 }

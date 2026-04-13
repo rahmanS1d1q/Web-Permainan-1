@@ -2,6 +2,187 @@
 import { Ic } from "../icons.jsx";
 import { SFX } from "../sounds.js";
 import { BetSelector } from "../ui/modals.jsx";
+
+// SVG Crown — Heads face
+const CrownSVG = (
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* base bar */}
+    <rect
+      x="10"
+      y="44"
+      width="44"
+      height="8"
+      rx="3"
+      fill="#92400e"
+      stroke="#d97706"
+      strokeWidth="1"
+    />
+    <rect
+      x="10"
+      y="44"
+      width="44"
+      height="4"
+      rx="2"
+      fill="#fbbf24"
+      opacity="0.4"
+    />
+    {/* crown body */}
+    <path
+      d="M10 44 L10 28 L20 38 L32 16 L44 38 L54 28 L54 44 Z"
+      fill="#d97706"
+      stroke="#92400e"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
+    {/* inner highlight */}
+    <path
+      d="M14 44 L14 32 L22 40 L32 22 L42 40 L50 32 L50 44 Z"
+      fill="#fbbf24"
+      opacity="0.35"
+    />
+    {/* gems on crown points */}
+    <circle
+      cx="32"
+      cy="16"
+      r="4"
+      fill="#ef4444"
+      stroke="#7f1d1d"
+      strokeWidth="1"
+    />
+    <circle cx="32" cy="16" r="2" fill="#fca5a5" opacity="0.7" />
+    <circle
+      cx="10"
+      cy="28"
+      r="3.5"
+      fill="#3b82f6"
+      stroke="#1e3a8a"
+      strokeWidth="1"
+    />
+    <circle cx="10" cy="28" r="1.8" fill="#bfdbfe" opacity="0.7" />
+    <circle
+      cx="54"
+      cy="28"
+      r="3.5"
+      fill="#3b82f6"
+      stroke="#1e3a8a"
+      strokeWidth="1"
+    />
+    <circle cx="54" cy="28" r="1.8" fill="#bfdbfe" opacity="0.7" />
+    {/* base gems */}
+    <circle
+      cx="22"
+      cy="48"
+      r="2.5"
+      fill="#10b981"
+      stroke="#065f46"
+      strokeWidth="0.8"
+    />
+    <circle
+      cx="32"
+      cy="48"
+      r="2.5"
+      fill="#ef4444"
+      stroke="#7f1d1d"
+      strokeWidth="0.8"
+    />
+    <circle
+      cx="42"
+      cy="48"
+      r="2.5"
+      fill="#10b981"
+      stroke="#065f46"
+      strokeWidth="0.8"
+    />
+    {/* shine on crown */}
+    <path
+      d="M14 30 Q18 26 22 30"
+      stroke="#fef9c3"
+      strokeWidth="1.2"
+      fill="none"
+      opacity="0.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M42 30 Q46 26 50 30"
+      stroke="#fef9c3"
+      strokeWidth="1.2"
+      fill="none"
+      opacity="0.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+// SVG Eagle — Tails face
+const EagleSVG = (
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* body */}
+    <ellipse cx="32" cy="36" rx="14" ry="16" fill="#d97706" />
+    <ellipse cx="32" cy="36" rx="14" ry="16" fill="#fbbf24" opacity="0.3" />
+    {/* left wing */}
+    <path
+      d="M18 34 Q8 24 6 16 Q12 22 18 28 Q14 18 16 10 Q20 20 20 30 Q16 22 20 16 Q22 26 18 34Z"
+      fill="#92400e"
+      stroke="#78350f"
+      strokeWidth="0.8"
+    />
+    <path d="M18 34 Q10 26 8 18 Q13 23 18 30" fill="#d97706" opacity="0.5" />
+    {/* right wing */}
+    <path
+      d="M46 34 Q56 24 58 16 Q52 22 46 28 Q50 18 48 10 Q44 20 44 30 Q48 22 44 16 Q42 26 46 34Z"
+      fill="#92400e"
+      stroke="#78350f"
+      strokeWidth="0.8"
+    />
+    <path d="M46 34 Q54 26 56 18 Q51 23 46 30" fill="#d97706" opacity="0.5" />
+    {/* head */}
+    <circle cx="32" cy="22" r="10" fill="#fef9c3" />
+    <circle cx="32" cy="22" r="10" fill="#fde047" opacity="0.6" />
+    {/* head highlight */}
+    <circle cx="29" cy="19" r="4" fill="#fff" opacity="0.3" />
+    {/* eye */}
+    <circle cx="35" cy="21" r="3" fill="#1c1917" />
+    <circle cx="35" cy="21" r="1.5" fill="#292524" />
+    <circle cx="36" cy="20" r="0.8" fill="#fff" opacity="0.9" />
+    {/* beak */}
+    <path
+      d="M32 25 L38 27 L34 30 Z"
+      fill="#d97706"
+      stroke="#92400e"
+      strokeWidth="0.8"
+    />
+    {/* white head patch */}
+    <ellipse cx="30" cy="20" rx="6" ry="5" fill="#fff" opacity="0.85" />
+    <ellipse cx="30" cy="20" rx="4" ry="3.5" fill="#fef9c3" opacity="0.6" />
+    {/* tail feathers */}
+    <path
+      d="M26 50 Q28 56 32 58 Q36 56 38 50 Q34 54 32 52 Q30 54 26 50Z"
+      fill="#92400e"
+      stroke="#78350f"
+      strokeWidth="0.8"
+    />
+    {/* talons */}
+    <path
+      d="M26 50 Q22 54 20 56"
+      stroke="#78350f"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M38 50 Q42 54 44 56"
+      stroke="#78350f"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M32 52 Q32 56 32 58"
+      stroke="#78350f"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
 export function CoinFlip({ coins, onResult }) {
   const [choice, setChoice] = useState(null);
   const [flipping, setFlipping] = useState(false);
@@ -106,7 +287,9 @@ export function CoinFlip({ coins, onResult }) {
             >
               {/* outer ring detail */}
               <div className="coin-inner">
-                <div className="coin-symbol">👑</div>
+                <div className="coin-symbol" style={{ width: 44, height: 44 }}>
+                  {CrownSVG}
+                </div>
                 <div className="coin-label">HEADS</div>
               </div>
             </div>
@@ -125,7 +308,9 @@ export function CoinFlip({ coins, onResult }) {
               className={`coin-ring ${outcome?.win && outcome.result === "tails" ? "ring-win" : outcome && outcome.result !== "tails" ? "ring-lose" : ""}`}
             >
               <div className="coin-inner">
-                <div className="coin-symbol">🦅</div>
+                <div className="coin-symbol" style={{ width: 44, height: 44 }}>
+                  {EagleSVG}
+                </div>
                 <div className="coin-label">TAILS</div>
               </div>
             </div>
@@ -172,7 +357,25 @@ export function CoinFlip({ coins, onResult }) {
             disabled={flipping}
             className={`flex-1 rounded-xl py-3 text-sm font-bold transition ${choice === c ? "btn-gold" : "btn-outline"}`}
           >
-            {c === "heads" ? "👑  Heads" : "🦅  Tails"}
+            {c === "heads" ? (
+              <span className="flex items-center justify-center gap-2">
+                <span
+                  style={{ width: 20, height: 20, display: "inline-block" }}
+                >
+                  {CrownSVG}
+                </span>
+                Heads
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                <span
+                  style={{ width: 20, height: 20, display: "inline-block" }}
+                >
+                  {EagleSVG}
+                </span>
+                Tails
+              </span>
+            )}
           </button>
         ))}
       </div>
