@@ -801,6 +801,119 @@ export function AutoBetModal({ settings, onChange, onClose }) {
   );
 }
 
+// ── Sound Pack Modal ───────────────────────────────────────────────────────────
+import {
+  SOUND_PACKS,
+  getSoundPack,
+  setSoundPack,
+  SFX_PACK,
+} from "../sounds.js";
+
+export function SoundPackModal({ onClose }) {
+  const [current, setCurrent] = useState(getSoundPack());
+  const select = (id) => {
+    setSoundPack(id);
+    setCurrent(id);
+    SFX_PACK.click();
+    // Preview the win sound
+    setTimeout(() => SFX_PACK.win(), 150);
+  };
+  const ICONS = {
+    classic: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      >
+        <path d="M9 18V5l12-2v13" />
+        <circle cx="6" cy="18" r="3" />
+        <circle cx="18" cy="16" r="3" />
+      </svg>
+    ),
+    modern: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      >
+        <path d="M3 12h4l3-8 4 16 3-8h4" />
+      </svg>
+    ),
+    retro: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      >
+        <rect x="2" y="6" width="20" height="12" rx="2" />
+        <path d="M6 10h2M6 14h2M10 10h2M10 14h2M14 10h6M14 14h6" />
+      </svg>
+    ),
+  };
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="card-glass m-4 w-full max-w-xs rounded-2xl p-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-sm font-bold text-yellow-400 tracking-widest">
+            SOUND PACK
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-6 h-6 text-yellow-700 hover:text-yellow-400"
+          >
+            <span className="w-4 h-4 block">{Ic.close}</span>
+          </button>
+        </div>
+        <div className="space-y-2">
+          {SOUND_PACKS.map((pack) => (
+            <button
+              key={pack.id}
+              type="button"
+              onClick={() => select(pack.id)}
+              className={`w-full flex items-center gap-3 rounded-xl border px-4 py-3 transition-all text-left ${current === pack.id ? "border-yellow-500 bg-yellow-950/40" : "border-[#2a1e00] bg-[#0f0c00] hover:border-yellow-900"}`}
+            >
+              <span
+                className={`w-8 h-8 flex-shrink-0 ${current === pack.id ? "text-yellow-400" : "text-yellow-800"}`}
+              >
+                {ICONS[pack.id]}
+              </span>
+              <div className="flex-1">
+                <p
+                  className={`text-sm font-bold ${current === pack.id ? "text-yellow-400" : "text-yellow-700"}`}
+                >
+                  {pack.label}
+                </p>
+                <p className="text-[10px] text-yellow-900">{pack.desc}</p>
+              </div>
+              {current === pack.id && (
+                <span className="w-4 h-4 text-yellow-400 flex-shrink-0">
+                  {Ic.check}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        <p className="mt-3 text-center text-[10px] text-yellow-900">
+          Preview plays on select
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Tutorial Modal ─────────────────────────────────────────────────────────────
 import { TUTORIAL_STEPS } from "../constants.js";
 

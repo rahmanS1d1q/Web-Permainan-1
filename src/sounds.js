@@ -185,33 +185,23 @@ function playSlotJackpot() {
 }
 
 export const SFX = {
-  // Slot machine sounds — lebih realistis
   slotSpinStart: startSlotSpin,
   slotSpinStop: stopSlotSpin,
   slotReelStop: playSlotStop,
   slotWin: playSlotWin,
   slotJackpot: playSlotJackpot,
 
-  // Generic spin (untuk game lain)
   spin: () => {
     playTone(220, "sawtooth", 0.08, 0.1);
     playTone(180, "sawtooth", 0.08, 0.08, 0.05);
   },
-  click: () => playTone(600, "sine", 0.05, 0.1),
-  win: () => {
-    [523, 659, 784, 1047].forEach((f, i) =>
-      playTone(f, "sine", 0.15, 0.2, i * 0.1),
-    );
-  },
-  bigwin: () => {
-    [523, 659, 784, 1047, 1319].forEach((f, i) =>
-      playTone(f, "triangle", 0.2, 0.3, i * 0.08),
-    );
-  },
-  lose: () => {
-    playTone(200, "sawtooth", 0.15, 0.15);
-    playTone(150, "sawtooth", 0.15, 0.12, 0.1);
-  },
+  // win/lose/bigwin/click/bonus delegate to SFX_PACK (set after declaration)
+  click: () => SFX_PACK.click(),
+  win: () => SFX_PACK.win(),
+  bigwin: () => SFX_PACK.bigwin(),
+  lose: () => SFX_PACK.lose(),
+  bonus: () => SFX_PACK.bonus(),
+
   flip: () => {
     for (let i = 0; i < 6; i++)
       playTone(300 + i * 80, "sine", 0.06, 0.1, i * 0.05);
@@ -229,11 +219,6 @@ export const SFX = {
       playTone(200 + i * 30, "sine", 0.08, 0.08, i * 0.12);
   },
   plinko: () => playTone(500 + Math.random() * 300, "sine", 0.05, 0.12),
-  bonus: () => {
-    [523, 659, 784, 1047, 1319, 1568].forEach((f, i) =>
-      playTone(f, "sine", 0.2, 0.25, i * 0.07),
-    );
-  },
   achieve: () => {
     [800, 1000, 1200, 1000, 800].forEach((f, i) =>
       playTone(f, "triangle", 0.1, 0.25, i * 0.06),
@@ -332,3 +317,129 @@ export function rouletteLose() {
   playTone(140, "sawtooth", 0.2, 0.12, 0.12);
   playNoise(0.08, 0.1, 0.05, 200);
 }
+
+// ── Sound Pack System ─────────────────────────────────────────────────────────
+export const SOUND_PACK_KEY = "casino-sound-pack";
+export const SOUND_PACKS = [
+  { id: "classic", label: "Classic", desc: "Warm casino tones" },
+  { id: "modern", label: "Modern", desc: "Crisp electronic" },
+  { id: "retro", label: "Retro", desc: "8-bit chiptune" },
+];
+
+let _pack = localStorage.getItem(SOUND_PACK_KEY) || "classic";
+export function getSoundPack() {
+  return _pack;
+}
+export function setSoundPack(id) {
+  _pack = id;
+  localStorage.setItem(SOUND_PACK_KEY, id);
+}
+
+// Pack-aware tone player
+function packTone(freq, duration, vol, delay = 0) {
+  if (_pack === "retro") {
+    // 8-bit: square wave, higher freq, shorter
+    playTone(freq * 1.5, "square", duration * 0.6, vol * 0.9, delay);
+  } else if (_pack === "modern") {
+    // Modern: sine + slight detune
+    playTone(freq, "sine", duration, vol, delay);
+    playTone(freq * 1.005, "sine", duration * 0.8, vol * 0.4, delay + 0.01);
+  } else {
+    // Classic: triangle, warm
+    playTone(freq, "triangle", duration, vol, delay);
+  }
+}
+
+export const SFX_PACK = {
+  win: () => {
+    if (_muted) return;
+    if (_pack === "retro") {
+      [523, 659, 784, 1047].forEach((f, i) =>
+        playTone(f * 1.5, "square", 0.1, 0.25, i * 0.07),
+      );
+    } else if (_pack === "modern") {
+      [440, 554, 659, 880].forEach((f, i) =>
+        playTone(f, "sine", 0.14, 0.22, i * 0.08),
+      );
+      [440, 554, 659, 880].forEach((f, i) =>
+        playTone(f * 2, "sine", 0.06, 0.08, i * 0.08 + 0.02),
+      );
+    } else {
+      [523, 659, 784, 1047].forEach((f, i) =>
+        playTone(f, "triangle", 0.15, 0.2, i * 0.1),
+      );
+    }
+  },
+  lose: () => {
+    if (_muted) return;
+    if (_pack === "retro") {
+      playTone(300, "square", 0.08, 0.2);
+      playTone(200, "square", 0.12, 0.18, 0.08);
+      playTone(150, "square", 0.15, 0.15, 0.18);
+    } else if (_pack === "modern") {
+      playTone(220, "sawtooth", 0.12, 0.15);
+      playTone(180, "sine", 0.18, 0.12, 0.08);
+    } else {
+      playTone(200, "sawtooth", 0.15, 0.15);
+      playTone(150, "sawtooth", 0.15, 0.12, 0.1);
+    }
+  },
+  bigwin: () => {
+    if (_muted) return;
+    if (_pack === "retro") {
+      [523, 659, 784, 1047, 1319, 1568].forEach((f, i) =>
+        playTone(f * 1.5, "square", 0.15, 0.3, i * 0.06),
+      );
+    } else if (_pack === "modern") {
+      [440, 554, 659, 880, 1108, 1318].forEach((f, i) =>
+        playTone(f, "sine", 0.18, 0.28, i * 0.06),
+      );
+      for (let i = 0; i < 6; i++)
+        playNoise(0.12, 0.02, i * 0.06, 2000 + i * 300);
+    } else {
+      [523, 659, 784, 1047, 1319].forEach((f, i) =>
+        playTone(f, "triangle", 0.2, 0.3, i * 0.08),
+      );
+    }
+  },
+  streak: () => {
+    // Special sound for hot streak milestone
+    if (_muted) return;
+    if (_pack === "retro") {
+      [800, 1000, 1200, 1600].forEach((f, i) =>
+        playTone(f, "square", 0.08, 0.3, i * 0.05),
+      );
+    } else if (_pack === "modern") {
+      [600, 800, 1000, 1200].forEach((f, i) =>
+        playTone(f, "sine", 0.1, 0.25, i * 0.05),
+      );
+      playNoise(0.1, 0.05, 0.18, 1500);
+    } else {
+      [600, 800, 1000, 800, 600].forEach((f, i) =>
+        playTone(f, "triangle", 0.1, 0.22, i * 0.06),
+      );
+    }
+  },
+  click: () => {
+    if (_muted) return;
+    if (_pack === "retro") playTone(800, "square", 0.04, 0.15);
+    else if (_pack === "modern") playTone(700, "sine", 0.04, 0.1);
+    else playTone(600, "sine", 0.05, 0.1);
+  },
+  bonus: () => {
+    if (_muted) return;
+    if (_pack === "retro") {
+      [523, 659, 784, 1047, 1319, 1568].forEach((f, i) =>
+        playTone(f * 1.5, "square", 0.12, 0.28, i * 0.06),
+      );
+    } else if (_pack === "modern") {
+      [523, 659, 784, 1047, 1319, 1568].forEach((f, i) =>
+        playTone(f, "sine", 0.18, 0.25, i * 0.06),
+      );
+    } else {
+      [523, 659, 784, 1047, 1319, 1568].forEach((f, i) =>
+        playTone(f, "sine", 0.2, 0.25, i * 0.07),
+      );
+    }
+  },
+};

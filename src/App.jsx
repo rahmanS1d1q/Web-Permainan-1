@@ -26,7 +26,7 @@ import {
   savePrestige,
   PRESTIGE_BONUSES,
 } from "./constants.js";
-import { SFX, getMuted, setMuted } from "./sounds.js";
+import { SFX, getMuted, setMuted, SFX_PACK } from "./sounds.js";
 import { Ic, GameIcons } from "./icons.jsx";
 import { ErrorBoundary } from "./ui/ErrorBoundary.jsx";
 import { useSwipe } from "./hooks/useSwipe.js";
@@ -42,8 +42,9 @@ import {
   DailyMissionsModal,
   PrestigeModal,
   AutoBetModal,
+  SoundPackModal,
 } from "./ui/modals.jsx";
-import { XPBar, WeeklyWidget } from "./ui/widgets.jsx";
+import { XPBar, WeeklyWidget, HotStreak } from "./ui/widgets.jsx";
 import { SlotMachine } from "./games/SlotMachine.jsx";
 import { CoinFlip } from "./games/CoinFlip.jsx";
 import { LuckyNumber } from "./games/LuckyNumber.jsx";
@@ -126,6 +127,8 @@ export default function App() {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("casino-theme") || "dark",
   );
+  const [showSoundPack, setShowSoundPack] = useState(false);
+  const prevStreakRef = useRef(0);
 
   const sessionRef = useRef({
     startCoins: saved?.coins ?? startCoins,
@@ -194,7 +197,7 @@ export default function App() {
       const idx = e.key === "0" ? 9 : parseInt(e.key) - 1;
       if (!isNaN(idx) && idx >= 0 && idx < GAMES.length) {
         setActiveGame(GAMES[idx].id);
-        SFX.click();
+        SFX_PACK.click();
       }
     };
     window.addEventListener("keydown", handler);
@@ -338,6 +341,17 @@ export default function App() {
       haptic(delta > 0 ? "win" : "lose");
       showToast(delta > 0 ? `+${delta} coins` : `${delta} coins`, delta > 0);
       if (delta >= BIG_WIN_THRESHOLD) setBigWin(delta);
+
+      // Hot streak milestone sound
+      if (newStats && delta > 0) {
+        const s = newStats.currentStreak;
+        if ((s === 3 || s === 6 || s === 10) && s > prevStreakRef.current) {
+          SFX_PACK.streak();
+        }
+        prevStreakRef.current = s;
+      } else if (delta <= 0) {
+        prevStreakRef.current = 0;
+      }
       if (newStats) {
         const event = {
           type: eventType ?? (delta > 0 ? "win" : "lose"),
@@ -394,7 +408,7 @@ export default function App() {
     setDailyStreak(streak);
     setCoins((c) => c + bonus);
     setHighScore((h) => Math.max(h, coins + bonus));
-    SFX.bonus();
+    SFX_PACK.bonus();
     showToast(`+${bonus} daily bonus!`, true);
     if (streak >= 7)
       setAchievements((cur) => {
@@ -418,7 +432,7 @@ export default function App() {
   const claimMission = (idx) => {
     const m = dailyMissions[idx];
     if (!m || m.claimed || m.progress < m.target) return;
-    SFX.bonus();
+    SFX_PACK.bonus();
     setCoins((c) => c + m.reward);
     showToast(`+${m.reward} mission reward!`, true);
     const updated = dailyMissions.map((ms, i) =>
@@ -505,7 +519,7 @@ export default function App() {
   const switchGame = (id) => {
     setPrevGame(activeGame);
     setActiveGame(id);
-    SFX.click();
+    SFX_PACK.click();
     setTimeout(() => setPrevGame(null), 350);
   };
   const toggleMute = () => {
@@ -627,6 +641,9 @@ export default function App() {
           onChange={setAutoBetSettings}
           onClose={() => setShowAutoBet(false)}
         />
+      )}
+      {showSoundPack && (
+        <SoundPackModal onClose={() => setShowSoundPack(false)} />
       )}
 
       {levelUpMsg && (
@@ -817,6 +834,15 @@ export default function App() {
             </button>
             <button
               type="button"
+              onClick={() => setShowSoundPack(true)}
+              className="toolbar-btn"
+              title="Sound Pack"
+            >
+              <span className="w-4 h-4">{Ic.settings}</span>
+              <span>Sounds</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setTutStep(0)}
               className="toolbar-btn"
               title="Tutorial"
@@ -831,6 +857,12 @@ export default function App() {
           <XPBar xp={xp} prestige={prestige} />
         </div>
 
+        {/* Hot Streak */}
+        {stats.currentStreak >= 3 && (
+          <div className="mb-2 flex justify-center">
+            <HotStreak streak={stats.currentStreak} />
+          </div>
+        )}
         {showWeekly && (
           <div className="mb-3">
             <WeeklyWidget
@@ -845,7 +877,7 @@ export default function App() {
                   setWeeklyClaimed(true);
                   setCoins((c) => c + weeklyChallenge.reward);
                   showToast(`+${weeklyChallenge.reward} weekly reward!`, true);
-                  SFX.bonus();
+                  SFX_PACK.bonus();
                   haptic("win");
                 }}
                 className="btn-gold mt-2 w-full py-2 text-sm"

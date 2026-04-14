@@ -28,14 +28,14 @@ function drawWheel(canvas, angle) {
     r = cx - 6;
   ctx.clearRect(0, 0, W, W);
 
-  // outer ring
+  // ── Outer ring (fixed, tidak rotate) ──
   ctx.beginPath();
   ctx.arc(cx, cy, r + 5, 0, 2 * Math.PI);
   ctx.strokeStyle = "#d97706";
   ctx.lineWidth = 8;
   ctx.stroke();
 
-  // segments
+  // ── Segments (rotate dengan angle) ──
   SEGMENTS.forEach((seg, i) => {
     const start = angle + i * SLICE - Math.PI / 2;
     const end = start + SLICE;
@@ -49,7 +49,7 @@ function drawWheel(canvas, angle) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // label
+    // label — di tengah segment
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(start + SLICE / 2);
@@ -60,29 +60,50 @@ function drawWheel(canvas, angle) {
     ctx.restore();
   });
 
-  // center hub
-  const hub = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
-  hub.addColorStop(0, "#fbbf24");
-  hub.addColorStop(1, "#92400e");
+  // ── Center hub (fixed) ──
+  const hub = ctx.createRadialGradient(cx - 4, cy - 4, 2, cx, cy, 22);
+  hub.addColorStop(0, "#fde047");
+  hub.addColorStop(0.4, "#d97706");
+  hub.addColorStop(1, "#78350f");
   ctx.beginPath();
   ctx.arc(cx, cy, 22, 0, 2 * Math.PI);
   ctx.fillStyle = hub;
   ctx.fill();
-  ctx.strokeStyle = "#d97706";
+  ctx.strokeStyle = "#fbbf24";
   ctx.lineWidth = 2;
   ctx.stroke();
-
-  // pointer (top)
   ctx.beginPath();
-  ctx.moveTo(cx, 4);
-  ctx.lineTo(cx - 10, 22);
-  ctx.lineTo(cx + 10, 22);
-  ctx.closePath();
+  ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
   ctx.fillStyle = "#fbbf24";
+  ctx.fill();
+
+  // ── Pointer — FIXED di top center, tidak ikut rotate ──
+  // Pointer menunjuk ke bawah (ke dalam wheel) dari posisi top
+  const ptrTip = 2; // ujung pointer (atas)
+  const ptrBase = 20; // pangkal pointer
+  const ptrW = 10; // setengah lebar pangkal
+  ctx.beginPath();
+  ctx.moveTo(cx, ptrTip);
+  ctx.lineTo(cx - ptrW, ptrBase);
+  ctx.lineTo(cx + ptrW, ptrBase);
+  ctx.closePath();
+  const pg = ctx.createLinearGradient(cx, ptrTip, cx, ptrBase);
+  pg.addColorStop(0, "#fbbf24");
+  pg.addColorStop(1, "#d97706");
+  ctx.fillStyle = pg;
   ctx.fill();
   ctx.strokeStyle = "#92400e";
   ctx.lineWidth = 1.5;
   ctx.stroke();
+  // shine
+  ctx.beginPath();
+  ctx.moveTo(cx - 3, ptrTip + 3);
+  ctx.lineTo(cx + 3, ptrTip + 3);
+  ctx.lineTo(cx + 1, ptrBase - 4);
+  ctx.lineTo(cx - 1, ptrBase - 4);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(255,255,255,0.3)";
+  ctx.fill();
 }
 
 export function WheelOfFortune({ coins, onResult }) {
@@ -107,26 +128,39 @@ export function WheelOfFortune({ coins, onResult }) {
     setResult(null);
     setSpinning(true);
 
-    // pick result segment
+    // Pick result segment
     const segIdx = Math.floor(Math.random() * SEGMENTS.length);
     const seg = SEGMENTS[segIdx];
 
-    // target angle: segment center at top (pointer)
-    const targetSegAngle = -(segIdx * SLICE) + Math.PI / 2 - SLICE / 2;
-    const fullSpins = (5 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
-    const startAngle = angleRef.current;
-    const endAngle =
-      startAngle +
-      fullSpins +
-      (targetSegAngle -
-        (((startAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)));
+    // ── Kalkulasi target angle yang benar ──
+    // Pointer ada di TOP canvas = sudut -π/2 dalam koordinat canvas
+    // Segment i digambar mulai dari: wheelAngle + i*SLICE - π/2
+    // Center segment i ada di:       wheelAngle + i*SLICE - π/2 + SLICE/2
+    //
+    // Supaya CENTER segment segIdx tepat di pointer (top = -π/2):
+    //   wheelAngle + segIdx*SLICE - π/2 + SLICE/2 = -π/2  (mod 2π)
+    //   wheelAngle = -segIdx*SLICE - SLICE/2               (mod 2π)
+    //
+    // Normalisasi ke [0, 2π]:
+    const rawTarget =
+      (-(segIdx * SLICE) - SLICE / 2 + 2 * Math.PI * 10) % (2 * Math.PI);
+
+    // Dari posisi saat ini, tambah minimal 5 putaran penuh ke depan
+    const currentNorm =
+      ((angleRef.current % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    let delta = rawTarget - currentNorm;
+    if (delta <= 0) delta += 2 * Math.PI; // pastikan maju ke depan
+    const extraSpins = (5 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
+    const endAngle = angleRef.current + delta + extraSpins;
 
     const duration = 4000;
+    const startAngle = angleRef.current;
     const startTime = performance.now();
 
     const animate = (now) => {
       const elapsed = now - startTime;
       const t = Math.min(elapsed / duration, 1);
+      // ease-out quart — smooth deceleration
       const eased = 1 - Math.pow(1 - t, 4);
       const angle = startAngle + (endAngle - startAngle) * eased;
       angleRef.current = angle;
@@ -134,6 +168,9 @@ export function WheelOfFortune({ coins, onResult }) {
       if (t < 1) {
         animRef.current = requestAnimationFrame(animate);
       } else {
+        // Snap tepat ke target
+        angleRef.current = endAngle;
+        draw(endAngle);
         const net = seg.mult > 0 ? Math.floor(bet * seg.mult) - bet : -bet;
         setResult({ seg, net });
         onResult(net, seg.mult === 20 ? "wheel_jackpot" : undefined);

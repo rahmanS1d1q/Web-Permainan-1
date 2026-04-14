@@ -1025,3 +1025,38 @@ body {
   border-color: #d97706;
   color: #78350f;
 }
+
+/* ── Hot Streak ── */
+@keyframes flame {
+  0%,
+  100% {
+    transform: scaleY(1) scaleX(1) translateY(0);
+  }
+  25% {
+    transform: scaleY(1.12) scaleX(0.92) translateY(-2px);
+  }
+  50% {
+    transform: scaleY(0.95) scaleX(1.06) translateY(1px);
+  }
+  75% {
+    transform: scaleY(1.08) scaleX(0.96) translateY(-1px);
+  }
+}
+.flame-svg {
+  animation: flame 0.7s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes streak-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 12px #f9731644;
+  }
+  50% {
+    box-shadow:
+      0 0 28px #f97316aa,
+      0 0 48px #f9731633;
+  }
+}
+.streak-indicator {
+  animation: streak-pulse 1.2s ease-in-out infinite;
+}
