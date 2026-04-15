@@ -45,6 +45,8 @@ import {
   SoundPackModal,
 } from "./ui/modals.jsx";
 import { XPBar, WeeklyWidget, HotStreak } from "./ui/widgets.jsx";
+import { CoinRain, ConfettiBurst } from "./ui/particles.jsx";
+import { exportStatsCSV } from "./utils/exportStats.js";
 import { SlotMachine } from "./games/SlotMachine.jsx";
 import { CoinFlip } from "./games/CoinFlip.jsx";
 import { LuckyNumber } from "./games/LuckyNumber.jsx";
@@ -129,6 +131,8 @@ export default function App() {
   );
   const [showSoundPack, setShowSoundPack] = useState(false);
   const prevStreakRef = useRef(0);
+  const [showCoinRain, setShowCoinRain] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const sessionRef = useRef({
     startCoins: saved?.coins ?? startCoins,
@@ -340,7 +344,19 @@ export default function App() {
       }
       haptic(delta > 0 ? "win" : "lose");
       showToast(delta > 0 ? `+${delta} coins` : `${delta} coins`, delta > 0);
-      if (delta >= BIG_WIN_THRESHOLD) setBigWin(delta);
+      if (delta >= BIG_WIN_THRESHOLD) {
+        setBigWin(delta);
+        // Jackpot event atau win sangat besar → confetti, otherwise coin rain
+        if (
+          eventType === "jackpot" ||
+          eventType === "wheel_jackpot" ||
+          delta >= BIG_WIN_THRESHOLD * 5
+        ) {
+          setShowConfetti(true);
+        } else {
+          setShowCoinRain(true);
+        }
+      }
 
       // Hot streak milestone sound
       if (newStats && delta > 0) {
@@ -516,6 +532,19 @@ export default function App() {
     }
   };
 
+  const handleExportStats = () => {
+    exportStatsCSV({
+      stats,
+      gameStats,
+      history,
+      achievements,
+      xp,
+      highScore,
+      coins,
+    });
+    showToast("Stats exported!", true);
+  };
+
   const switchGame = (id) => {
     setPrevGame(activeGame);
     setActiveGame(id);
@@ -597,6 +626,11 @@ export default function App() {
       {bigWin && (
         <BigWinOverlay amount={bigWin} onDone={() => setBigWin(null)} />
       )}
+      <CoinRain active={showCoinRain} onDone={() => setShowCoinRain(false)} />
+      <ConfettiBurst
+        active={showConfetti}
+        onDone={() => setShowConfetti(false)}
+      />
       {pendingAchieve && (
         <AchievementToast
           achievement={pendingAchieve}
@@ -811,6 +845,15 @@ export default function App() {
             >
               <span className="w-4 h-4">{Ic.share}</span>
               <span>Share</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleExportStats}
+              className="toolbar-btn"
+              title="Export Stats CSV"
+            >
+              <span className="w-4 h-4">{Ic.chart}</span>
+              <span>Export</span>
             </button>
             <button
               type="button"
