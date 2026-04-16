@@ -358,6 +358,141 @@ export function StatsModal({
   );
 }
 
+// ── Judol Warning Modal ────────────────────────────────────────────────────────
+export function JudolWarningModal({ onAccept }) {
+  const [checked, setChecked] = useState(false);
+  return (
+    <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/95 backdrop-blur-md">
+      <div className="card-glass m-4 w-full max-w-sm rounded-2xl overflow-hidden">
+        {/* Red header bar */}
+        <div className="bg-red-700 px-5 py-3 flex items-center gap-3">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            className="w-6 h-6 flex-shrink-0"
+          >
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <p className="text-white font-bold tracking-widest text-sm uppercase">
+            Peringatan Penting
+          </p>
+        </div>
+
+        <div className="p-5">
+          {/* NO JUDOL badge */}
+          <div className="flex justify-center mb-4">
+            <div className="rounded-2xl border-2 border-red-600 bg-red-950/60 px-6 py-3 text-center">
+              <p className="text-3xl font-black text-red-400 tracking-[0.15em]">
+                🚫 NO JUDOL
+              </p>
+              <p className="text-[10px] text-red-600 tracking-[0.3em] mt-0.5">
+                SAY NO TO GAMBLING
+              </p>
+            </div>
+          </div>
+
+          {/* Warning points */}
+          <div className="space-y-2.5 mb-4">
+            {[
+              [
+                "App ini adalah game simulasi hiburan semata.",
+                "Tidak ada uang asli yang dipertaruhkan atau dimenangkan.",
+              ],
+              [
+                "Judi online adalah ILEGAL di Indonesia.",
+                "Melanggar UU ITE & KUHP, ancaman pidana hingga 10 tahun.",
+              ],
+              [
+                "Judi dapat menyebabkan kecanduan.",
+                "Jika kamu atau orang terdekat bermasalah, hubungi 119 ext 8.",
+              ],
+            ].map(([title, desc], i) => (
+              <div
+                key={i}
+                className="flex gap-3 rounded-xl border border-[#2a1e00] bg-[#0f0c00] p-3"
+              >
+                <div
+                  className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold mt-0.5 ${i === 1 ? "bg-red-700 text-white" : "bg-yellow-700 text-black"}`}
+                >
+                  {i + 1}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-yellow-400">{title}</p>
+                  <p className="text-[10px] text-yellow-800 mt-0.5">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Checkbox */}
+          <label className="flex items-start gap-3 cursor-pointer mb-4 select-none">
+            <div
+              onClick={() => setChecked((c) => !c)}
+              className={`w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all mt-0.5 cursor-pointer ${checked ? "bg-yellow-500 border-yellow-500" : "border-[#3d2e00] bg-[#0f0c00]"}`}
+            >
+              {checked && (
+                <svg
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-3 h-3"
+                >
+                  <path d="M2 6l3 3 5-5" />
+                </svg>
+              )}
+            </div>
+            <p className="text-[11px] text-yellow-700 leading-relaxed">
+              Saya memahami bahwa ini adalah{" "}
+              <span className="text-yellow-400 font-bold">
+                game simulasi hiburan
+              </span>
+              , bukan platform judi. Saya berusia 17+ tahun dan bermain dengan
+              bertanggung jawab.
+            </p>
+          </label>
+
+          <button
+            type="button"
+            onClick={onAccept}
+            disabled={!checked}
+            className="btn-gold w-full py-3 text-sm tracking-widest"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+              >
+                <path d="M4 10 L8 14 L16 6" />
+              </svg>
+              Saya Mengerti — Mulai Bermain
+            </span>
+          </button>
+
+          {/* Hotline */}
+          <p className="mt-3 text-center text-[9px] text-yellow-900">
+            Hotline Kecanduan Judi:{" "}
+            <span className="text-yellow-700 font-bold">119 ext 8</span> ·
+            Gratis 24 jam
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Daily Bonus modal (with streak) ───────────────────────────────────────────
 export function DailyBonusModal({ streak, bonus, onClaim }) {
   return (

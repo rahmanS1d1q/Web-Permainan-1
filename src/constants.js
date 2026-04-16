@@ -24,6 +24,7 @@ export const DAILY_KEY = "casino-daily-bonus";
 export const MUTE_KEY = "casino-muted";
 export const WEEKLY_KEY = "casino-weekly";
 export const TUTORIAL_KEY = "casino-tutorial-done";
+export const JUDOL_WARNING_KEY = "casino-judol-warning-shown";
 export const BIG_WIN_THRESHOLD = 100;
 export const DAILY_STREAK_BONUSES = [200, 250, 300, 400, 500, 600, 1000];
 

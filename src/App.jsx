@@ -25,6 +25,7 @@ import {
   getPrestige,
   savePrestige,
   PRESTIGE_BONUSES,
+  JUDOL_WARNING_KEY,
 } from "./constants.js";
 import { SFX, getMuted, setMuted, SFX_PACK } from "./sounds.js";
 import { Ic, GameIcons } from "./icons.jsx";
@@ -43,6 +44,7 @@ import {
   PrestigeModal,
   AutoBetModal,
   SoundPackModal,
+  JudolWarningModal,
 } from "./ui/modals.jsx";
 import { XPBar, WeeklyWidget, HotStreak } from "./ui/widgets.jsx";
 import { CoinRain, ConfettiBurst } from "./ui/particles.jsx";
@@ -133,6 +135,9 @@ export default function App() {
   const prevStreakRef = useRef(0);
   const [showCoinRain, setShowCoinRain] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showJudolWarning, setShowJudolWarning] = useState(
+    () => !localStorage.getItem(JUDOL_WARNING_KEY),
+  );
 
   const sessionRef = useRef({
     startCoins: saved?.coins ?? startCoins,
@@ -582,6 +587,15 @@ export default function App() {
     <div
       className={`casino-bg relative overflow-x-hidden ${theme === "light" ? "theme-light" : ""}`}
     >
+      {/* Judol Warning — shown once, z-[300] above everything */}
+      {showJudolWarning && (
+        <JudolWarningModal
+          onAccept={() => {
+            localStorage.setItem(JUDOL_WARNING_KEY, "1");
+            setShowJudolWarning(false);
+          }}
+        />
+      )}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-yellow-600/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-yellow-800/5 blur-3xl" />
@@ -1095,12 +1109,51 @@ export default function App() {
           ))}
         </div>
 
-        <p
-          className="mt-4 text-center text-yellow-950"
-          style={{ fontSize: "clamp(8px,2vw,10px)", letterSpacing: "0.2em" }}
-        >
-          FOR ENTERTAINMENT ONLY · NO JUDOL
-        </p>
+        {/* Footer warning banner */}
+        <div className="mt-4 rounded-xl border border-red-900/40 bg-red-950/20 px-4 py-3">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="#ef4444"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              className="w-4 h-4 flex-shrink-0"
+            >
+              <path d="M10 2 L18 17 H2 Z" />
+              <path d="M10 8 L10 12" />
+              <circle cx="10" cy="14.5" r="0.8" fill="#ef4444" stroke="none" />
+            </svg>
+            <p className="text-xs font-bold text-red-500 tracking-[0.2em] uppercase">
+              🚫 Say No to Judol
+            </p>
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="#ef4444"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              className="w-4 h-4 flex-shrink-0"
+            >
+              <path d="M10 2 L18 17 H2 Z" />
+              <path d="M10 8 L10 12" />
+              <circle cx="10" cy="14.5" r="0.8" fill="#ef4444" stroke="none" />
+            </svg>
+          </div>
+          <p
+            className="text-center text-red-700/80"
+            style={{ fontSize: "clamp(8px,2vw,9px)", letterSpacing: "0.15em" }}
+          >
+            FOR ENTERTAINMENT ONLY · TIDAK ADA UANG ASLI · JUDI ONLINE ILEGAL DI
+            INDONESIA
+          </p>
+          <p
+            className="text-center text-red-900 mt-0.5"
+            style={{ fontSize: "clamp(7px,1.8vw,8px)" }}
+          >
+            Hotline Kecanduan Judi: 119 ext 8 (Gratis 24 jam)
+          </p>
+        </div>
       </div>
     </div>
   );
